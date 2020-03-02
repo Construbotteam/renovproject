@@ -1,21 +1,3 @@
-# renovproject
-renovproject
-<<<<<<< HEAD
-<<<<<<< HEAD
-# Lz
-=======
+# Notification
 
-# Lz
-
-# Yue
-<<<<<<< HEAD
->>>>>>> dev_lz
-=======
-
-#Linzhu Dev
->>>>>>> dev_lz
-=======
-
-
-# zy
->>>>>>> dev
+This is repo for indoor renovation robot.
