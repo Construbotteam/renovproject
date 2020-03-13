@@ -1,0 +1,34 @@
+<launch>
+
+  <!-- set /global_example parameter -->
+  <!-- <include file="$(find painting_robot_demo)/launch/search_usb_port.launch">
+  </include>
+  <include file="$(find painting_robot_demo)/launch/plc_node.launch">
+  </include>
+
+  <include file="$(find painting_robot_demo)/launch/mobile_platform_driver.launch">
+  </include>
+  <include file="$(find painting_robot_demo)/launch/climb_robot_node.launch">
+  </include>
+  <include file="$(find painting_robot_demo)/launch/aubo_control_node.launch">
+  </include> 
+  <include file="$(find painting_robot_demo)/launch/climb_stand_flex_rotation_home_node.launch">
+  </include>
+  -->
+  <group ns="search_port">
+
+    <param name="climb_max_length" value="0.5" />
+    <param name="climb_way_point_length" value="0.2"/>
+    <param name="rotation_distance_tracking_over" value="0"/>
+    <param name="climb_distance_tracking_over" value="0"/>
+    <param name="mobile_tracking_stop_flag" value="0"/>
+    <param name="climb_num_way_point" value="2"/>
+    <param name="path_num_planning" value="3"/>
+    <param name="mobile_path_way_planning" value="0"/>
+    <node pkg="painting_robot_demo" type="painting_opreating_node_os.py" name="painting_opreating_node_os" output="screen" >
+    </node>
+    
+  </group>
+  
+</launch>
+

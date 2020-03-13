@@ -1,0 +1,34 @@
+<launch>
+
+  <!-- set /global_example parameter -->  
+  <group ns="search_port">
+
+    <!-- set /search_port/imu_port -->
+    <param name="imu_port" value="/dev/ttyUSB0" />
+    <!-- set /search_port/imu_port_baudrate -->
+    <param name="imu_port_baudrate" value="115200" />
+
+    <!-- set /search_port/plc_port -->
+    <param name="plc_port" value="/dev/ttyUSB1" />
+    <!-- set /search_port/plc_port_baudrate -->
+    <param name="plc_port_baudrate" value="115200" />
+    <!-- set /search_port/plc_modbussearchcmd -->
+    <param name="plc_port_search_cmd" value="010300050001940b" />
+    <!-- set /search_port/3dof_port -->
+    <param name="climb_port" value="/dev/ttyUSB2" />
+    <!-- set /search_port/imu_port_baudrate -->
+    <param name="climb_port_baudrate" value="19200" />
+    <!-- set /search_port/all_port_ok_flag -->
+    <param name="plc_port_ok_flag" value="0" />
+    <!-- set /search_port/imu_port_ok_flag -->
+    <param name="imu_port_ok_flag" value="0" />
+    <!-- set /search_port/climb_port_ok_flag -->
+    <param name="climb_port_ok_flag" value="0" />
+
+    <node pkg="painting_robot_demo" type="search_usb_port_pub.py" name="search_usb_port_pub" output="screen" >
+    
+    </node>
+    
+  </group>
+  
+</launch>

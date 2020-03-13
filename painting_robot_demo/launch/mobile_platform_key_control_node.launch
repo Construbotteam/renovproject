@@ -1,0 +1,15 @@
+<launch>
+  <!-- set /global_example parameter -->  
+  <group ns="search_port">
+
+    <!--set /plc_pkg_para/top_limit_switch_status-->
+    <!-- <param name="top_limit_switch_status" value="0" /> -->
+
+
+    <node pkg="painting_robot_demo" type="mobileplatform_keyboard_ros_steptech.py" name="mobileplatform_keyboard_ros_steptech" output="screen" >
+    </node>
+    
+  </group>
+  
+</launch>
+

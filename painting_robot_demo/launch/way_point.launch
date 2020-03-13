@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="painting_robot_demo" type="straight_line_path" name="straight_line_path" output="screen" >
+    <param name="file_addr" value="/data/ros/yue_wk_2019/src/painting_robot_demo/config/way_point.yaml" />
+    <param name="map_frame_id" value="map" />
+    <param name="base_frame_id" value="base_link" />
+    <param name="path_topic" value="straight_path" />
+    <param name="manipulator_status_name" value="open_control_mobile_platform" />
+    <param name="plan_frequency" value="10.0" />
+  </node>
+</launch>

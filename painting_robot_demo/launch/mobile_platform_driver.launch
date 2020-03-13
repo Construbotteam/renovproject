@@ -1,0 +1,23 @@
+<launch>
+
+  <!-- set /global_example parameter -->  
+  <!-- roslaunch cartographer_ros cartographer_demo_rplidar_localization.launch -->
+  <!-- roslaunch cartographer_ros cartographer_demo_rplidar.launch -->
+  <param name="path_index" value="1" />
+  <group ns="search_port">
+
+    <!--set /climb_pkg_para/close all 3dof driver-->
+    <param name="open_control_mobile_platform" value="0"/>
+    <param name="mobile_tracking_stop_flag" value="0" />
+    <param name="mobile_way_point_judge_status" value="0" />
+    
+    <!--set /climb_pkg_para/close all 3dof driver-->
+    <param name="ref_velocity" value="0.12"/>
+
+    <node pkg="painting_robot_demo" type="mobile_control_node.py" name="mobile_control_node" output="screen" >
+    </node>
+    
+  </group>
+  
+</launch>
+

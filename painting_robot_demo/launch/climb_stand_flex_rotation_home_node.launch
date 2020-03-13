@@ -1,0 +1,14 @@
+<launch>
+
+  <!-- set /global_example parameter -->  
+  <group ns="search_port">
+
+    <param name="home_climb_flex_bar" value="0"/>
+
+    <node pkg="painting_robot_demo" type="climb_flex_bar_homing.py" name="climb_flex_bar_homing" output="screen" >
+    </node>
+    
+  </group>
+  
+</launch>
+

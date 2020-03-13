@@ -1,0 +1,16 @@
+<launch>
+
+  <!-- set /global_example parameter -->  
+  <group ns="search_port">
+
+    <!--set /climb_pkg_para/close all 3dof driver-->
+    <param name="cansolib_path" value="/data/ros/yue_wk_2019/src/painting_robot_demo/lib/libcontrolcan.so"/>
+
+    <!--set /climb_pkg_para/enable_control_stand_bar-->
+    <param name="canyaml_config_path" value="/data/ros/yue_wk_2019/src/painting_robot_demo/src/config/" />
+    <!--set /climb_pkg_para/enable_control_rotation-->
+    <param name="yaml_can_name" value="mobileparameter.yaml"/>   
+  </group>
+  
+</launch>
+

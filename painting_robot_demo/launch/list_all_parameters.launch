@@ -1,0 +1,14 @@
+<launch>
+
+  <!-- set /global_example parameter -->  
+  <group ns="search_port">
+    <!-- list parameters -->
+    <param name="list_parameter_hz" value="0.1"/>
+    <param name="ns_name" value="search_port"/>
+    <node pkg="painting_robot_demo" type="list_parameters.py" name="list_parameters" output="screen" >
+    </node>
+    
+  </group>
+  
+</launch>
+

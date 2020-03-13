@@ -1,0 +1,118 @@
+nDeviceType: 4 #设备类型USBCAN-2A or USBCAN-2C or CANalyst-II
+zlgnDeviceType: 3 #设备类型USBCAN-2A or USBCAN-2C or CANalyst-II
+nDeviceInd: 0 #设备索引
+nCanId: 0 # 0-->1通道 1-->2通道
+sync_data_ID: 0x00000080
+walking_channel_sdo:
+  chn1: 0x00000601  # front left walking wheels
+  chn2: 0x00000602  # front right walking wheels
+  chn3: 0x00000603  # rear left walking wheels
+  chn4: 0x00000604  # rear right walking wheels
+steering_channel_sdo:
+  chn1: 0x00000605 # front left steering wheels
+  chn2: 0x00000606  # front right steering wheels
+  chn3: 0x00000607 # rear left steering wheels
+  chn4: 0x00000608  # rear right steering wheels
+walking_channel_pdo:
+  front_walking_left_rpdo:
+    rpdo:
+      rpdo1: 0x00000201  # front left walking wheels work model/control word
+      rpdo2: 0x00000301  # front left walking wheels ti shape velocity
+      rpdo3: 0x00000401  # front target velocity/target position
+
+    tpdo:
+      tpdo1: 0x00000181  # front left walking wheels valid working model and status byte
+      tpdo2: 0x00000281  # front left walking wheels real position and velocity
+      tpdo3: 0x00000381  # front left walking wheels error code
+  front_walking_right_rpdo:
+    rpdo:
+      rpdo1: 0x00000202  # front right walking wheels
+      rpdo2: 0x00000302  # front right walking wheels
+      rpdo3: 0x00000402  # front right walking wheels
+
+    tpdo:
+      tpdo1: 0x00000182  # front right walking wheels valid working model and status byte
+      tpdo2: 0x00000282  # front right walking wheels real position and velocity
+      tpdo3: 0x00000382  # front right walking wheels error code
+  rear_walking_left_rpdo:
+    rpdo:
+      rpdo1: 0x00000203  # rear left walking wheels
+      rpdo2: 0x00000303  # rear left walking wheels
+      rpdo3: 0x00000403  # rear left walking wheels
+
+    tpdo:
+      tpdo1: 0x00000183  # rear left walking wheels valid working model and status byte
+      tpdo2: 0x00000283  # rear left walking wheels real position and velocity
+      tpdo3: 0x00000383  # rear left walking wheels error code
+  rear_walking_right_rpdo:
+    rpdo:
+      rpdo1: 0x00000204  # rear right walking wheels
+      rpdo2: 0x00000304  # rear right walking wheels
+      rpdo3: 0x00000404  # rear right walking wheels
+
+    tpdo:
+      tpdo1: 0x00000184  # front right walking wheels valid working model and status byte
+      tpdo2: 0x00000284  # front right walking wheels real position and velocity
+      tpdo3: 0x00000384  # front right walking wheels error code
+
+steering_channel_pdo:
+  front_steering_left_rpdo:
+    rpdo:
+      rpdo1: 0x00000205  # front left steering wheels
+      rpdo2: 0x00000305  # front left steering wheels
+      rpdo3: 0x00000405  # front left steering wheels
+
+    tpdo:
+      tpdo1: 0x00000185  # front left steering wheels valid working model and status byte
+      tpdo2: 0x00000285  # front left steering wheels real position and velocity
+      tpdo3: 0x00000385  # front left steering wheels error code
+  front_steering_right_rpdo:
+    rpdo:
+      rpdo1: 0x00000206  # front right steering wheels
+      rpdo2: 0x00000306  # front right steering wheels
+      rpdo3: 0x00000406  # front right steering wheels
+
+    tpdo:
+      tpdo1: 0x00000186  # front right steering wheels valid working model and status byte
+      tpdo2: 0x00000286  # front right steering wheels real position and velocity
+      tpdo3: 0x00000386  # front right steering wheels error code
+  rear_steering_left_rpdo:
+    rpdo:
+      rpdo1: 0x00000207  # rear left steering wheels
+      rpdo2: 0x00000307  # rear left steering wheels
+      rpdo3: 0x00000407  # rear left steering wheels
+
+    tpdo:
+      tpdo1: 0x00000187  # rear left steering wheels valid working model and status byte
+      tpdo2: 0x00000287  # rear left steering wheels real position and velocity
+      tpdo3: 0x00000387  # rear left steering wheels error code
+  rear_steering_right_rpdo:
+    rpdo:
+      rpdo1: 0x00000208  # rear right steering wheels
+      rpdo2: 0x00000308  # rear right steering wheels
+      rpdo3: 0x00000408  # rear right steering wheels
+
+    tpdo:
+      tpdo1: 0x00000188  # front right steering wheels valid working model and status byte
+      tpdo2: 0x00000288  # front right steering wheels real position and velocity
+      tpdo3: 0x00000388  # front right steering wheels error code
+# mode of motors (steering && walking)
+# 0 -> position; 1 -> velocity; 2 -> current
+Frames_Length: 1 # 每次发送几帧
+steering_mode: 0 
+walking_mode: 1
+Homing_driver_fix_encoder_data:
+  fl: 30000  # corresponding impulse of steering motor (front left)
+  fr: 28000  # corresponding impulse of steering motor (front right)
+  rl: 24000 # corresponding impulse of steering motor (rear left)
+  rr: 28000  # corresponding impulse of steering motor (rear right)
+Homing_abs_encoder_data:
+  fl: 25902  # corresponding impulse of steering motor (front left)
+  fr: 26811  # corresponding impulse of steering motor (front right)
+  rl: 27190 # corresponding impulse of steering motor (rear left)
+  rr: 24511  # corresponding impulse of steering motor (rear right)
+Homing_error_limit: 3
+Pid_parameter: 
+  P: 0.5
+  I: 0.3
+  D: 0.001

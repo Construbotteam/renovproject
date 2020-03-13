@@ -1,0 +1,61 @@
+<launch>
+  <!-- set /global_example parameter -->  
+  <group ns="search_port">
+    <!--set /plc_pkg_para/top_limit_switch_status 1-on -->
+    <param name="read_buffer_bytes_num" value="6" />
+    <!--set /plc_pkg_para/top_limit_switch_status 1-on -->
+    <param name="top_limit_switch_status" value="0" />
+    <!--set /plc_pkg_para/mid_limit_switch_status 1-on -->
+    <param name="mid_limit_switch_status" value="0" />
+    <!--set /plc_pkg_para/bottom_limit_switch_status 1 on-->
+    <param name="bottom_limit_switch_status" value="0" />
+
+
+    <param name="climb_distance_tracking_over" value="0" />
+    <!-- anticlockwise abs encode increase -->
+    <param name="rotation_abs_encode" value="0" />
+    <param name="rotation_distance_tracking_over" value="0" />
+
+    <!--the below ones are written by zy-->
+    <!--set /plc_pkg_para/test_plc_communication-->
+    <param name="test_plc_communication" value="0" />
+    <!--set /plc_pkg_para/read_line_encode-->
+    <param name="read_line_encode" value="0" />
+    <!--set /plc_pkg_para/read_limit_switch_status-->
+    <param name="read_limit_switch_status" value="0" />
+    <!--set /plc_pkg_para/read_echos_status-->
+    <param name="read_echos_status" value="0" />
+
+    <!--set /plc_pkg_para/write_front_light_open_forever 1-->
+    <param name="write_front_light_open_forever" value="0" />
+    <!--set /plc_pkg_para/write_front_light_fast_blink 2-->
+    <param name="write_front_light_fast_blink" value="0" />
+    <!--set /plc_pkg_para/write_front_light_slow_blink 3-->
+    <param name="write_front_light_slow_blink" value="0" />
+    <!--set /plc_pkg_para/write_front_lingth_close 4-->
+    <param name="write_front_lingth_close" value="0" />
+
+    <!--set /plc_pkg_para/write_flex_pole_motor_close 3-->
+    <param name="write_flex_pole_motor_close" value="0" />
+    <!--set /plc_pkg_para/write_flex_pole_motor_up 1-->
+    <param name="write_flex_pole_motor_up" value="0" />
+    <!--set /plc_pkg_para/write_flex_pole_motor_down 2-->
+    <param name="write_flex_pole_motor_down" value="0" />
+
+    <!--set /plc_pkg_para/write_mobile_platform_brake_close-->
+    <param name="write_mobile_platform_brake_close" value="1" />
+    <!--set /plc_pkg_para/write_mobile_platform_brake_open-->
+    <param name="write_mobile_platform_brake_open" value="0" />
+
+    <!--set /plc_pkg_para/write_electric_switch_painting_close 1-->
+    <param name="write_electric_switch_painting_close" value="0" />
+    <!--set /plc_pkg_para/write_electric_switch_painting_open 1 -->
+    <param name="write_electric_switch_painting_open" value="0" />
+
+    <node pkg="painting_robot_demo" type="plc_node.py" name="plc_node" output="screen" >
+    </node>
+    
+  </group>
+  
+</launch>
+
