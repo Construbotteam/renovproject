@@ -1,19 +1,37 @@
 ## Notification
-Hi,This is lz repo. Including a sample omnidirection path tracking controller,zhouligong CAN analysis driver,a 8 motors driver,aubo5 or aubo10 manipulator driver,a sample end-effector sector planning alogrithm,a 3-DOF climbing robot driver with 485 and a plc driver node.
+Hi,This is lz repo. Including a simple omnidirection path tracking controller,zhouligong CAN analysis driver,a 8 motors driver,aubo5 or aubo10 manipulator driver,a simple end-effector sector planning alogrithm,a 3-DOF climbing robot driver with 485 and a plc driver node.
 
 **For getting more details,Please see the documentation folder.**
 
 The painting_robot_demo folder is the main folder,you can just clone to your ROS pkg src folder to use them.
+
+
 The config foler contains the common plc parameter and mobile platform parameters for initial all node
+
+
 The lib folder contains zhouligong CAN analysis Dynamic-link library.
-The robot folder will contain the robot program
-The scripts folder is also another main foler. The 3dof_flex_bar_homing folder is used for homing all robot except mobile platform.
+
+
+The scripts folder is also another **main foler**. The 3dof_flex_bar_homing folder is used for homing all robot except mobile platform.
+
+
 The 3dof_platform_driver folder and aubo_manipulator_driver contains 3DOF dirver and aubo manipulator driver respectively. 
-The coverage_path_planning folder is *Empty* right now, 
+
+
+The coverage_path_planning folder is *Empty* right now.
+
+
 The list_all_parameters folder contains a noder to show all ROS parameter server's parameters.Because we maintain a huge parameter server' parameters form to control all those thing.
+
+
 The mobile_platform_driver and painting_opreating_planning use for control mobile and painting tools.
+
+
 The plc_package folder is used for PLC board control.
-The usb_port_fixed_node folder is a node for choosing USB port automaticall of Ubuntu 18.0.4(Recommended)/16.0.4
+
+
+The usb_port_fixed_node folder is a node for choosing USB port automaticall of Ubuntu 18.0.4(Recommended)/16.0.4.
+
 
 ## Catkin_Make
 To build all code:
@@ -42,10 +60,10 @@ otherwise it will not work. And before you control the Robot,you must know all p
     <!-- anticlockwise abs encode increase -->
     <param name="rotation_abs_encode" value="0" />
     <param name="rotation_distance_tracking_over" value="0" />
-
-
 ```
 We have a complex system with more than 50 parameters,of course we need to optimazting this. Ha ha.
+
+
 ## Run simulator
 To run the simulator:
 1. you need to change another repo name painting_robot_description
