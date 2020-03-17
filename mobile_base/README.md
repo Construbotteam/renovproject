@@ -1,7 +1,7 @@
 # renov_robot
 
-# Attention!! This part code is under refactoring, please compile the code at 
-version v1.0 of this branch if necessary or from commit-6b565970...
+**Attention!! This part of code is under refactoring, please compile the code at
+version v1.0 of this branch if necessary or from commit-6b565970...**
 
 navigation stack of renovation robot
 
