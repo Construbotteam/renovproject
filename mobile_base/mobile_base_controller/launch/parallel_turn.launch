@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="mobile_base_controller" type="parallel_turn_controller_node" name="parallel_turn_controller_node" output="screen">
+    <!-- <param name="config_file_addr" name=" "/> -->
+    <!-- <param name="joint_signal_pub_topic" value="joint_signal"/><param name="path_sub_topic" value="path"/><param name="map_frame_id" value="map"/><param name="base_frame_id" value="base_link"/><param name="control_freq" value="10.0"/><param name="front_rear_track"   value="0.5"/><param name="left_right_track"   value="0.395"/><param name="wheel_radius"   value="0.15"/> -->
+    <param name="forward_dis"  value="0.2"/>
+    <param name="max_acc" value="0.5"/>
+    <param name="arrival_tolerance" value="0.05"/>
+    <param name="yaw_tolerance"   value="0.08"/>
+    <param name="turning_tolerance"   value="1.5708"/>
+    <param name="max_linear_velocity"   value="30.0"/>
+    <param name="max_angular_velocity"   value="0.05"/>
+    <param name="max_turning_speed"   value="0.7"/>
+    <param name="linear_kp" value="10.0"/>
+    <param name="linear_ki" value="1.0"/>
+    <param name="linear_kd" value="1.0"/>
+    <param name="angular_kp" value="0.5"/>
+    <param name="angular_kp" value="0.1"/>
+    <param name="angular_kp" value="0.1"/>
+  </node>
+</launch>

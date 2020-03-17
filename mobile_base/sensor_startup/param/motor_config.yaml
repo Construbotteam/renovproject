@@ -1,0 +1,56 @@
+device_type: 4  # divice type number of can analyst
+device_index: 0  # divice index of can analyst
+can_index: 0  # channel number of can 
+id_num: 4  # total quantity of device attached to can analyst
+
+# mode of motors (steering && walking)
+# 0 -> position; 1 -> velocity; 2 -> current
+steering_mode: 0 
+walking_mode: 1
+
+encoder_s: 2500  # encoder line of steering motor
+encoder_w: 2500  # encoder line of walking motor
+abs_encoder: 1024  # encoder line of absolute encoders
+frequency_multiplier: 4 
+variance_limit: 1
+reduc_ratio_s: 220  # reduction ratio of steering motor
+reduc_ratio_w: 20.15  # reduction ratio of walking motor
+# profile velocity applied to limit maximum 
+# velocity especially for position mode
+max_velocity: 1500  
+
+walking_channel:
+  chn1: 1  # front walking wheels
+  chn2: 2  # rear walking wheels
+
+steering_channel:
+  chn1: 3  # front steering wheels
+  chn2: 4  # rear steering wheels
+
+
+motor_sign:
+  fwl: 1  # front walking left
+  fwr: 0  # front walking right
+  rwl: 1  # rear walking left
+  rwr: 0  # rear walking right
+  fsl: 0  # front steering left
+  fsr: 0  # front steering right
+  rsl: 0  # rear steering left
+  rsr: 0  # rear steering right
+
+homing:
+  fl: 27118  # corresponding impulse of steering motor (front left)
+  fr: 29262  # corresponding impulse of steering motor (front right)
+  rl: 30036 # corresponding impulse of steering motor (rear left)
+  rr: 27800  # corresponding impulse of steering motor (rear right)
+
+homing_error_limit: 5 
+
+home_control:
+  p: 5.0
+  i: 2.0
+  d: 0.0
+
+front_rear_track: 0.5  # length of mobile_base
+left_right_track: 0.395  # width of mobile_base
+wheel_radius:

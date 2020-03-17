@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  
+  <!-- <include file="$(find rplidar_ros)/launch/a3.launch" /> -->
+  <include file="$(find sick_tim)/launch/sick_tim571_2050101.launch" />
+  <include file="$(find sensor_startup)/launch/imu_bringup.launch"/>
+  <include file="$(find mobile_base_description)/launch/static_transformation.launch" />
+
+</launch>

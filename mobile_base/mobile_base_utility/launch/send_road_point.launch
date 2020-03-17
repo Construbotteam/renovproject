@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="mobile_base_utility" type="send_road_point" name="send_road_point" output="screen" >
+    <param name="path_index_param_name" value="search_port/mobile_path_way_planning"/>
+    <param name="pub_goal_freq" value="15"/>
+     <param name="yaml_addr" value="/data/ros/renov_robot_ws/src/renov_robot/mobile_base_utility/config/send_road_point.yaml"/> 
+    <!--<param name="yaml_addr" value="/home/glh/renov_ws/src/renov_robot/mobile_base_utility/config/send_road_point.yaml"/>-->
+  </node>
+</launch>

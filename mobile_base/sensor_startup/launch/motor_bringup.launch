@@ -1,0 +1,11 @@
+<launch>
+  <node pkg="sensor_startup" type="motor_core" name="motor_core" output="screen">
+    <param name="port" value="ttyUSB0"/>
+    <param name="state_topic" value="motor_state"/>
+    <param name="file_address" 
+      value="/home/glh/renov_ws/src/renov_robot/sensor_startup/data/motor_config.yaml"/>
+    <param name="delay_time" value="10000"/>
+    <param name="wait_time" value="10"/>
+  </node>
+
+</launch>

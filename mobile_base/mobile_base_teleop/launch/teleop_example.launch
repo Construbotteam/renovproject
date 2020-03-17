@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="mobile_base_teleop" type="renov_teleop_key.py" name="renov_teleop_key" output="screen" />
+  <!-- <node pkg="sensor_startup" type="remote_control" name="remote_control" output="screen" /> -->
+  <node pkg="sensor_startup" type="send_teleop_signal" name="send_teleop_signal" output = "screen" />
+
+  <include file="$(find sensor_startup)/launch/motor_bringup.launch" />
+    
+</launch>

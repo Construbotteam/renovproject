@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="freq" default="5" />
+  <param name="imu_publish_rate" value="15"/>
+  <node pkg="sensor_startup" type="imu_reader_node" name="imu_reader" output="screen">
+    <param name="port_id" value="/dev/ttyUSB1" />
+    <param name="baud_rate" value="115200" />
+    <param name="imu_frame_id" value="imu_link"/>
+    <param name="imu_pub_topic" value="imu"/>
+    <param name="use_request" value="false"/>
+    <!-- output_freq should only be : 5 15 25 35 50 100 -->
+    <param name="output_freq" value="15"/>
+    <param name="use_debug" value="false" />
+  </node>
+
+<!--  <node pkg="imu_complementary_filter" type="complementary_filter_node" name="complementary_filter_gain_node" output="screen">
+    <param name="do_bias_estimation" value="true"/>
+    <param name="do_adaptive_gain" value="true"/>
+    <param name="use_mag" value="false"/>
+    <param name="gain_acc" value="0.01"/>
+    <param name="gain_mag" value="0.01"/>
+  </node>
+  -->
+
+<!--  <node pkg="imu_filter_madgwick" type="imu_filter_node" name="ImuFilter" output="screen">
+    <param name="use_mag" value="false"/>
+  </node> 
+ --> 
+</launch>

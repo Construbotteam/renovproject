@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find sensor_startup)/launch/motor_bringup.launch" />
+  <node pkg="sensor_startup" type="walking_demo" name="walking_demo" output="screen" />
+</launch>

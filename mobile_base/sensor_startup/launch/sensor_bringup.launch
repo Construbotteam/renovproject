@@ -1,0 +1,7 @@
+<launch>
+  
+  <include file="$(find sensor_startup)/launch/motor_bringup.launch"/>
+  <include file="$(find sensor_startup)/launch/sick_tim571_bringup.launch"/>
+  <include file="$(find sensor_startup)/launch/imu_bringup.launch"/>
+
+</launch>

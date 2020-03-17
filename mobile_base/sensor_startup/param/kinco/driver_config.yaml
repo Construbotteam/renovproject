@@ -1,0 +1,47 @@
+walk_id_num: 4  # total quantity of walking motor drivers connected to can analyst 
+steer_id_num: 4  # total quantity of steering motor drivers connected to can analyst 
+
+walking_mode: 0
+steering_mode: 1 
+
+encoder_s: 1024  # encoder line of steering motor
+encoder_w: 2500  # encoder line of walking motor
+frequency_multiplier: 4 
+reduc_ratio_s: 220  # reduction ratio of steering motor
+reduc_ratio_w: 20.15  # reduction ratio of walking motor
+
+# velocity applied while the driver is in position mode, 
+# the value corresponds to the actual value of wheels
+# uint -> rad/s
+trapezoid_velocity: 0.7    
+
+walk_id_num: 4
+steer_id_num: 4
+
+walking_channel:
+  chn1: 1  # front walking wheels
+  chn2: 2  # rear walking wheels
+
+steering_channel:
+  chn1: 3  # front steering wheels
+  chn2: 4  # rear steering wheels
+
+cob_id: [1, 2, 3, 4, 5, 6, 7, 8]
+
+motor_sign: [ 
+   0,  # front walking left
+   1,  # front walking right
+   0,  # rear walking left
+   1,  # rear walking right
+   0,  # front steering left
+   0,  # front steering right
+   0,  # rear steering left
+   0   # rear steering right
+]
+
+home_position: [15000, 14000, 12000, 14000]
+
+
+front_rear_track: 0.5  # length of mobile_base
+left_right_track: 0.395  # width of mobile_base
+wheel_radius: 0.075

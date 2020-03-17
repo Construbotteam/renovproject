@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="mobile_base_controller" type="move_base" name="move_base" output="screen">
+    <param name="map_frame_id" value="map"/>
+    <param name="base_frame_id" value="base_link"/>
+    <param name="use_hoffman_control" value="true"/>
+    <param name="preset_vel" value="0.2"/>
+  </node>
+</launch>

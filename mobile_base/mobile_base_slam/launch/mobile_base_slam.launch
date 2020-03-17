@@ -1,0 +1,23 @@
+<launch>
+
+  <!-- Arguments -->
+  <arg name="slam_methods" default="gmapping" doc="slam type [gmapping, cartographer]"/>
+  <arg name="open_rviz" default="true"/>
+  <arg name="urdf_file" default="$(find xacro)/xacro --inorder '$(find mobile_base_description)/urdf/mobile_base.urdf.xacro'" />
+  <param name="robot_description" command="$(arg urdf_file)" />
+  
+  <!--robot state publisher-->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="50.0" />
+  </node>
+
+  <!--SLAM methods-->
+  <include file="(find mobile_base_slam)/launch/mobile_base_$(arg slam_methods).launch"/>
+
+  <!-- rviz -->
+  <group if="$(arg open_rviz)"> 
+    <node pkg="rviz" type="rviz" name="rviz" required="true"
+      args="-d $(find mobile_base_slam)/rviz/mobile_base_$(arg slam_methods).rviz">
+    </node>
+  </group>
+</launch>

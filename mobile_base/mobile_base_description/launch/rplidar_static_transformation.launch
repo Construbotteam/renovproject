@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- <node pkg="tf" 
+        type="static_transform_publisher" 
+        name="broadcaster_name" 
+        args="x y z yaw pitch roll parent_frame child_frame time(=1000ms/HZ)"/>    -->
+	<!--
+  <node pkg="tf" 
+        type="static_transform_publisher" 
+        name="footprint_to_link" 
+        args="1 0 0 0 0 0 base_footprint base_link 100"/>  
+	-->
+
+
+
+	<!--
+  <node pkg="tf" 
+        type="static_transform_publisher" 
+        name="link_to_lidar"
+        args="0.485 -0.002 0 3.1415926 0 0 /base_link /laser_link 100"/> 
+  <node pkg="tf" 
+        type="static_transform_publisher" 
+        name="link_to_imu"
+        args="0.0385 -0.002 0 -1.5707963 0 0 /base_link /imu_link 100"/> 
+	-->
+
+
+	<!--
+  <node pkg="tf2_ros" 
+        type="static_transform_publisher" 
+        name="link_to_lidar"
+        args="0.485 -0.002 0 3.1415926 0 0 base_link laser_link"/> 
+  <node pkg="tf2_ros" 
+        type="static_transform_publisher" 
+        name="link_to_imu"
+        args="0.0385 -0.002 0 -1.5707963 0 0 base_link imu_link"/>
+	-->
+  <param name="robot_description" textfile="$(find mobile_base_description)/urdf/link_lidar_imu.urdf" />
+  <param name="publish_frequency" type="double" value="10.0" />
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" >
+  </node>
+
+
+</launch>

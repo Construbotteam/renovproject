@@ -1,0 +1,11 @@
+# geometry parameters of vehicle
+length: 1.0
+width: 2.0
+height: 3.0
+wheel_radius: 4.0
+collision_radius: 5.0
+
+
+# kinematics parameters of vehicle
+linear_velo_limit:   0.5  # m/s
+angular_velo_limit:  0.175  # rad/s

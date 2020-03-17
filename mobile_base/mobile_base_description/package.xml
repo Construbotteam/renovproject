@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package>
+  <name>mobile_base_description</name>
+  <version>0.0.0</version>
+  <description>
+    3D models of the renovation robot
+  </description>
+  <license>CLOSED</license>
+  <author email="georgeglh@link.cuhk.edu.hk">glh</author>
+  <maintainer email="georgeglh@link.cuhk.edu.hk">glh</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>urdf</build_depend>
+  <build_depend>xacro</build_depend>
+
+  <run_depend>urdf</run_depend>
+  <run_depend>xacro</run_depend>
+
+</package>

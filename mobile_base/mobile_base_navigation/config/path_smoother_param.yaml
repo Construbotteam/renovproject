@@ -1,0 +1,8 @@
+#forward_distance: 0.1
+forward_distance: 0.2
+max_linear_velo: 0.01
+max_angular_velo: 0.5
+
+dis_threshold: 0.03
+delta_t_sec: 0.05
+path_multi: 100000

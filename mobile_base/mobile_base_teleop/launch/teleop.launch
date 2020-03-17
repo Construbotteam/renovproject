@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+<!--
+  <node pkg="mobile_base_teleop" type="renov_teleop_key.py" name="renov_teleop_key" output="screen" />
+  <node pkg="sensor_startup" type="send_teleop_signal" name="send_teleop_signal" />
+-->
+  <node pkg="mobile_base_teleop" type="tele_operate" name="tele_operate" output="screen" >
+    <param name="teleop_signal_topic" value="cmd_base_joint" />
+    <param name="max_linear_v" value="44.0" />
+    <param name="max_angular_v" value="3.0" />
+    <param name="linear_v_increment" value="4.0" />
+    <param name="angular_v_increment" value="0.2" />
+  </node>
+</launch>

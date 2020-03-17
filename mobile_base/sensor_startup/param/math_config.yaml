@@ -1,0 +1,19 @@
+# covariance matrix of imu
+orientation_covariance: [0.01, 0.00, 0.00
+                         0.00, 0.01, 0.00
+                         0.00, 0.00, 0.01]
+
+
+angular_velocity_covariance: [0.01, 0.00, 0.00
+                              0.00, 0.01, 0.00
+                              0.00, 0.00, 0.01]
+
+
+
+linear_accleration_covariance: [0.0024, 0.0000, 0.0000,
+                                0.0000, 0.0024, 0.0000,
+                                0.0000, 0.0000, 0.0024]
+
+
+
+
