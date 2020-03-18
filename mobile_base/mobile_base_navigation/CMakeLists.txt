@@ -3,7 +3,6 @@ project(mobile_base_navigation)
 
 add_compile_options(-std=c++11)
 
-
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav_msgs
@@ -21,72 +20,23 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(yaml-cpp REQUIRED)
 
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES mobile_base_navigation
-#  CATKIN_DEPENDS geometry_msgs nav_msgs roscpp rospy sensor_msgs std_msgs tf
-#  DEPENDS system_lib
-)
+catkin_package()
 
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
 )
 
-add_library(lsd
-  src/LSD.cpp
+add_library(diff_planner 
+  src/diff_planner.cpp 
+  src/velo_generator.cpp
+  src/broke_line.cpp
 )
+target_link_libraries(diff_planner  ${catkin_LIBRARIES})
 
-add_library(detect
-  src/WallDetect.cpp
-)
-target_link_libraries(detect
-  lsd
-  ${catkin_LIBRARIES}
-)
 
-add_library(path_smoother
-  src/path_smoother.cpp
-)
-target_link_libraries(path_smoother
-  ${catkin_LIBRARIES}
-)
+# add_executable(diff_planner src/diff_base_planner.cpp)
+# target_link_libraries(diff_planner ${catkin_LIBRARIES})
 
-add_executable(detect_node
-  src/detect_node.cpp
-)
-target_link_libraries(detect_node
-  detect
-  lsd
-  ${catkin_LIBRARIES}
-)
-
-add_executable(mobile_base_planner
-  src/mobile_base_planner.cpp
-)
-target_link_libraries(mobile_base_planner
-  path_smoother
-  ${catkin_LIBRARIES}
-)
-
-add_executable(init_scan_match
-  src/init_scan_match.cpp
-)
-target_link_libraries(init_scan_match
-  yaml-cpp
-  ${catkin_LIBRARIES}
-)
-
-add_executable(test_map
-  src/test_map.cpp
-)
-target_link_libraries(test_map
-  ${catkin_LIBRARIES}
-)
-
-add_executable(show_traj
-  src/show_traj.cpp
-)
-target_link_libraries(show_traj
-  ${catkin_LIBRARIES}
-)
+add_executable(diff_base_planner src/diff_base_planner.cpp)
+target_link_libraries(diff_base_planner diff_planner ${catkin_LIBRARIES})

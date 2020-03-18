@@ -1,0 +1,32 @@
+max_v: 0.3
+max_theta: 0.5
+pure_rotation_max_theta_v_: 0.5
+
+acc_x_limit: 0.15 
+acc_y_limit: 2.5
+acc_theta_limit: 1.5
+
+xy_goal_tolerance: 0.05
+yaw_goal_tolerance: 0.05
+
+forward_index_delta: 6 
+control_freq: 20
+
+track_kp: 0.0 
+track_ki: 0.0 
+track_kd: 0.0
+
+th_kp: 0.0
+th_ki: 0.0
+th_kd: 0.0
+
+rotation_kp: 3.0 
+rotation_ki: 0.5
+rotation_kd: 0.0
+
+v_kp: 0.3
+v_ki: 0.2
+v_kd: 0.0
+
+k_coeff: 0.4 
+theta_coeff: 0.0 

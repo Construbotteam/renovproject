@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="costmap_gns" value="global_costmap" />
+	<arg name="costmap_lns" value="local_costmap" />
+	<arg name="planner_gns" value="global_planner" />
+	<arg name="planner_lns" value="local_planner" />
+	<arg name="diff_planner_lns" value="diff_planner" />
+	<arg name="path_smoother_ns" value="path_smoother" />
+	<arg name="freq" value="20" />
+	<!--  -->
+	<arg name="path_sub_topic" value="mobile_base_goal" />
+	<!--  -->
+	<node pkg="mobile_base_navigation" type="diff_base_planner" name="diff_base_planner" output="screen">
+		<!--  -->
+		<rosparam file="$(find mobile_base_navigation)/config/turtlebot3_params/costmap_common_param.yaml" command="load" ns="$(arg costmap_gns)" />
+		<rosparam file="$(find mobile_base_navigation)/config/turtlebot3_params/costmap_common_param.yaml" command="load" ns="$(arg costmap_lns)" />
+		<rosparam file="$(find mobile_base_navigation)/config/turtlebot3_params/global_costmap_param.yaml" command="load" />
+		<rosparam file="$(find mobile_base_navigation)/config/turtlebot3_params/local_costmap_param.yaml" command="load" />
+		<rosparam file="$(find mobile_base_navigation)/config/diff_local_planner_param.yaml" command="load" ns="$(arg diff_planner_lns)" />
+		<!--  -->
+		<param name="path_pub_topic" value="mobile_base_path" />
+		<param name="path_sub_topic" value="$(arg path_sub_topic)" />
+		<param name="path_frame_id" value="map" />
+		<param name="map_frame_id" value="map" />
+		<param name="base_frame_id" value="base_link" />
+		<param name="plan_frequency" value="$(arg freq)"/>
+		<!--  -->
+		<param name="global_costmap_namespace" value="$(arg costmap_gns)" />
+		<param name="local_costmap_namespace" value="$(arg costmap_lns)" />
+		<param name="global_planner_namespace" value="$(arg planner_gns)" />
+		<param name="local_planner_namespace" value="$(arg planner_lns)" />
+		<param name="diff_planner_namespace" value="$(arg diff_planner_lns)" />
+		<param name="path_smoother_namespace" value="$(arg path_smoother_ns)" />
+		<!--  -->
+		<param name="angular_arrival_tolerance" value="0.07"/>
+		<param name="$(arg planner_lns)/control_freq" value="$(arg freq)" />
+		<param name="$(arg planner_gns)/use_dijkstra" value="true" />
+		<param name="$(arg planner_lns)/meter_scoring" value="true" />
+		<remap from="$(arg path_sub_topic)" to="move_base_simple/goal" />
+	</node>
+</launch>

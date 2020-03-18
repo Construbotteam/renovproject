@@ -1,4 +1,4 @@
-local_costmap: 
+global_costmap: 
   global_frame: map
   robot_base_frame: base_link
 
@@ -9,6 +9,6 @@ local_costmap:
   static_map: false
   rolling_window: true
 
-  width: 5
-  height: 5
+  width: 16
+  height: 16
   resolution: 0.05
