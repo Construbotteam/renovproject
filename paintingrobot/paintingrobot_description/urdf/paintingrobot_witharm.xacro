@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<robot name="paintingrobot_witharm" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+    <xacro:include filename="$(find paintingrobot_description)/urdf/base/paintingrobot_description_witharm.urdf.xacro" />
+<!--include sensors-->
+    <xacro:include filename="$(find paintingrobot_description)/urdf/sensors/kinect_gazebo.xacro" />
+    <xacro:include filename="$(find paintingrobot_description)/urdf/sensors/lidar_gazebo.xacro" />
+    <xacro:include filename="$(find paintingrobot_description)/urdf/sensors/camera_gazebo.xacro" />
+    <xacro:include filename="$(find paintingrobot_description)/urdf/sensors/zed.xacro" />
+   
+
+
+<!--load xianquzhe base-->
+    <xacro:paintingrobot/>
+
+  <link name="base_footprint"/>
+
+    <joint name="planar_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <parent link="base_footprint"/>
+      <child link="base_link"/>
+    </joint>
+
+<!--load kinect-->
+<xacro:kinect_camera prefix="kinect"  />
+
+  <joint name="kinect_joint" type="fixed">
+    <parent link= "rodclimbing_link2"/>
+    <child link = "kinect_link" />
+    <origin xyz="0.1 0.0 0.5" rpy="0 0 0.0" />
+  </joint>
+  
+
+<!--load lidar-->
+<xacro:rplidar prefix="laser"  />
+
+  <joint name="laser_joint" type="fixed">
+    <parent link= "mobilebase_link"/>
+    <child link = "laser_link" />
+    <origin xyz="0.055 0.0 0.95" rpy="0.0 0.0 0.0" />
+  </joint>
+
+<!--load zed-->
+<xacro:zed prefix="zed"  />
+
+  <joint name="zed_joint" type="fixed">
+    <parent link= "wrist3_Link"/>
+    <child link = "zed_camera_center" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 ${-M_PI/2} ${-M_PI/2}" />
+  </joint>
+
+</robot>

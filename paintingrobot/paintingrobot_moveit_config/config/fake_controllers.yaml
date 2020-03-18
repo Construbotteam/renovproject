@@ -1,0 +1,18 @@
+controller_list:
+  - name: fake_mobileplatform_controller
+    joints:
+      - base_joint1
+      - base_joint2
+      - mobilebase_joint
+  - name: fake_rodclimbing_robot_controller
+    joints:
+      - rodclimbing_joint1
+      - rodclimbing_joint2
+  - name: fake_aubo5_controller
+    joints:
+      - shoulder_joint
+      - upperArm_joint
+      - foreArm_joint
+      - wrist1_joint
+      - wrist2_joint
+      - wrist3_joint

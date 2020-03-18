@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: paintingrobot_description
+    relative_path: urdf/paintingrobot_witharm.xacro
+    xacro_args: "--inorder "
+  SRDF:
+    relative_path: config/paintingrobot_witharm.srdf
+  CONFIG:
+    author_name: zy
+    author_email: zynwpu@hotmail.com
+    generated_timestamp: 1584325058

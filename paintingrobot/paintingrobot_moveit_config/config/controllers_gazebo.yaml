@@ -1,0 +1,28 @@
+controller_manager_ns: controller_manager
+controller_list:
+  - name: paintingrobot/aubo5_joint_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: true
+    joints:
+      - shoulder_joint
+      - upperArm_joint
+      - foreArm_joint
+      - wrist1_joint
+      - wrist2_joint
+      - wrist3_joint
+  - name: paintingrobot/rodclimbing_robot_joint_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: true
+    joints:
+      - rodclimbing_joint1
+      - rodclimbing_joint2
+  - name: paintingrobot/mobileplatform_joint_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: true
+    joints:
+      - base_joint1
+      - base_joint2
+      - mobilebase_joint

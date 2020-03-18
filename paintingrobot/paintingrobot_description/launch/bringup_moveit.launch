@@ -1,0 +1,15 @@
+<launch>
+  
+    <!-- Launch Gazebo  -->
+    <include file="$(find paintingrobot_description)/launch/gazebo_world.launch" />
+
+    <!-- ros_control arm launch file -->
+    <include file="$(find paintingrobot_description)/launch/gazebo_states.launch" />   
+
+    <!-- ros_control paintingrobot_description control dof arm launch file -->
+    <include file="$(find paintingrobot_description)/launch/trajectory_controller.launch" />
+
+    <!-- moveit launch file -->
+    <include file="$(find paintingrobot_moveit_config)/launch/moveit_planning_execution.launch" />
+
+</launch>

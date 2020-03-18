@@ -1,0 +1,41 @@
+paintingrobot:
+  aubo5_joint_controller:
+    type: "position_controllers/JointTrajectoryController"
+    joints:
+      - shoulder_joint
+      - upperArm_joint
+      - foreArm_joint
+      - wrist1_joint
+      - wrist2_joint
+      - wrist3_joint
+
+    gains:
+      shoulder_joint:   {p: 1000.0, i: 0.0, d: 0.1, i_clamp: 0.0}
+      upperArm_joint:   {p: 1000.0, i: 0.0, d: 0.1, i_clamp: 0.0}
+      foreArm_joint:   {p: 1000.0, i: 0.0, d: 0.1, i_clamp: 0.0}
+      wrist1_joint:   {p: 1000.0, i: 0.0, d: 0.1, i_clamp: 0.0}
+      wrist2_joint:   {p: 1000.0, i: 0.0, d: 0.1, i_clamp: 0.0}
+      wrist3_joint:   {p: 1000.0, i: 0.0, d: 0.1, i_clamp: 0.0}
+
+  rodclimbing_robot_joint_controller:
+    type: "position_controllers/JointTrajectoryController"
+    joints:
+      - rodclimbing_joint1
+      - rodclimbing_joint2
+
+    gains:
+      rodclimbing_joint1:   {p: 1000.0, i: 0.0, d: 0.1, i_clamp: 0.0}
+      rodclimbing_joint2:   {p: 1000.0, i: 0.0, d: 0.1, i_clamp: 0.0}
+
+  mobileplatform_joint_controller:
+    type: "position_controllers/JointTrajectoryController"
+    joints:
+      - base_joint1
+      - base_joint2
+      - mobilebase_joint
+
+    gains:
+      base_joint1:   {p: 1000.0, i: 0.0, d: 0.1, i_clamp: 0.0}
+      base_joint2:   {p: 1000.0, i: 0.0, d: 0.1, i_clamp: 0.0}
+      mobilebase_joint:   {p: 1000.0, i: 0.0, d: 0.1, i_clamp: 0.0}
+

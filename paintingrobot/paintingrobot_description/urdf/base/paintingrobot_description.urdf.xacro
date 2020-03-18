@@ -1,0 +1,445 @@
+<?xml version="1.0"?>
+<robot name="paintingrobot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  
+ <!-- robot -->
+<xacro:macro name="paintingrobot" params="prefix:=paintingrobot">	
+
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-9.74542958129844E-19 -8.30827569009276E-50 0.01"
+        rpy="0 0 0" />
+      <mass
+        value="0.15707963267949" />
+      <inertia
+        ixx="0.000103410758180664"
+        ixy="-2.44698917549945E-52"
+        ixz="1.99868489765398E-36"
+        iyy="0.000103410758180664"
+        iyz="-1.5177569000538E-37"
+        izz="0.000196349540849362" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="base_link2">
+    <inertial>
+      <origin
+        xyz="-9.74542958129844E-19 -8.30827569009276E-50 0.01"
+        rpy="0 0 0" />
+      <mass
+        value="0.15707963267949" />
+      <inertia
+        ixx="0.000103410758180664"
+        ixy="-2.44698917549945E-52"
+        ixz="1.99868489765398E-36"
+        iyy="0.000103410758180664"
+        iyz="-1.5177569000538E-37"
+        izz="0.000196349540849362" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/base_link2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/base_link2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_joint1"
+    type="prismatic">
+    <origin
+      xyz="0 0 -0.06"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="base_link2" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1000"
+      upper="1000"
+      effort="100"
+      velocity="10" />
+  </joint>
+  <link
+    name="base_link3">
+    <inertial>
+      <origin
+        xyz="-9.74542958129844E-19 1.66165513801855E-49 0.01"
+        rpy="0 0 0" />
+      <mass
+        value="0.15707963267949" />
+      <inertia
+        ixx="0.000103410758180664"
+        ixy="5.3018098802488E-52"
+        ixz="-3.37516786865257E-36"
+        iyy="0.000103410758180664"
+        iyz="-1.5177569000538E-37"
+        izz="0.000196349540849362" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/base_link3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/base_link3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_joint2"
+    type="prismatic">
+    <origin
+      xyz="0 0 -0.06"
+      rpy="0 0 0" />
+    <parent
+      link="base_link2" />
+    <child
+      link="base_link3" />
+    <axis
+      xyz="0 -1 0" />
+    <limit
+      lower="-1000"
+      upper="1000"
+      effort="100"
+      velocity="10" />
+  </joint>
+  <link
+    name="mobilebase_link">
+    <inertial>
+      <origin
+        xyz="0.0291577665599809 -2.72164924299828E-07 0.441881950379727"
+        rpy="0 0 0" />
+      <mass
+        value="455.358981535307" />
+      <inertia
+        ixx="44.9136198387836"
+        ixy="3.50536725170582E-05"
+        ixz="-1.212192154451"
+        iyy="57.9677287950582"
+        iyz="4.67729419428261E-05"
+        izz="41.3161598074795" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/mobilebase_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/mobilebase_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="mobilebase_joint"
+    type="revolute">
+    <origin
+      xyz="0 0 0.195"
+      rpy="0 0 0" />
+    <parent
+      link="base_link3" />
+    <child
+      link="mobilebase_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-3.2"
+      upper="3.2"
+      effort="1000"
+      velocity="10" />
+  </joint>
+  <link
+    name="rod_link">
+    <inertial>
+      <origin
+        xyz="0 -6.22346643472761E-19 2.19372384937239"
+        rpy="0 0 0" />
+      <mass
+        value="16.8939144946791" />
+      <inertia
+        ixx="27.0505138248194"
+        ixy="-9.98342727444939E-35"
+        ixz="2.5578757073893E-32"
+        iyy="27.0505138248194"
+        iyz="-1.46464356458114E-17"
+        izz="0.0113194528551953" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/rod_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0.768627450980392 0.529411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/rod_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rod_joint"
+    type="fixed">
+    <origin
+      xyz="0.055 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="mobilebase_link" />
+    <child
+      link="rod_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="rodclimbing_link1">
+    <inertial>
+      <origin
+        xyz="6.93889390390723E-18 7.42122137321897E-18 0.0180768324845659"
+        rpy="0 0 0" />
+      <mass
+        value="18.5984843965627" />
+      <inertia
+        ixx="0.326720473611573"
+        ixy="2.29228291350695E-17"
+        ixz="5.27407769936995E-18"
+        iyy="0.50578957745673"
+        iyz="3.37798961929826E-18"
+        izz="0.240649696019101" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/rodclimbing_link1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0.768627450980392 0.529411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/rodclimbing_link1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rodclimbing_joint1"
+    type="prismatic">
+    <origin
+      xyz="0 0 1.2119"
+      rpy="0 0 0" />
+    <parent
+      link="rod_link" />
+    <child
+      link="rodclimbing_link1" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.5"
+      upper="3.5"
+      effort="100"
+      velocity="10" />
+  </joint>
+  <link
+    name="rodclimbing_link2">
+    <inertial>
+      <origin
+        xyz="0.198799177954796 2.14617838848648E-17 0.021698767433032"
+        rpy="0 0 0" />
+      <mass
+        value="3.80486871498238" />
+      <inertia
+        ixx="0.119326861165646"
+        ixy="1.72526734960407E-18"
+        ixz="0.000187142864467349"
+        iyy="0.160129816052835"
+        iyz="-2.22753887319819E-18"
+        izz="0.0532964184778594" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/rodclimbing_link2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0.768627450980392 0.529411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/rodclimbing_link2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rodclimbing_joint2"
+    type="revolute">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="rodclimbing_link1" />
+    <child
+      link="rodclimbing_link2" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.58"
+      upper="3.2"
+      effort="100"
+      velocity="10" />
+  </joint>
+  <link
+    name="manipulatorbase_link">
+    <inertial>
+      <origin
+        xyz="5.39350203387912E-09 -0.0001896424631547 0.0164378389040267"
+        rpy="0 0 0" />
+      <mass
+        value="0.549895435681136" />
+      <inertia
+        ixx="0.0011097760848736"
+        ixy="-1.38075248072163E-11"
+        ixz="4.71554439639399E-13"
+        iyy="0.00111737670773042"
+        iyz="-1.26734365592631E-05"
+        izz="0.00206099321499423" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/manipulatorbase_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://paintingrobot_description/meshes/manipulatorbase_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="manipulatorbase_joint"
+    type="fixed">
+    <origin
+      xyz="0.3757 -0.00033749 0.028625"
+      rpy="0 0 0" />
+    <parent
+      link="rodclimbing_link2" />
+    <child
+      link="manipulatorbase_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+</xacro:macro>
+</robot>

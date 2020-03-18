@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>paintingrobot_navigation</name>
+  <version>1.2.0</version>
+  <description>
+    The paintingrobot_navigation provides roslaunch scripts for starting the navigation.
+  </description>
+  <license>Apache 2.0</license>
+  <author email="yezefeng92@163.com">Zefeng Ye</author>
+  <maintainer email="yezefeng92@163.com">Zefeng Ye</maintainer>
+
+  <url type="website">http://wiki.ros.org/paintingrobot_navigation</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <exec_depend>amcl</exec_depend>
+  <exec_depend>map_server</exec_depend>
+  <exec_depend>move_base</exec_depend>
+
+</package>
