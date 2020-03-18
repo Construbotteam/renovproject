@@ -7,7 +7,7 @@
 ## Move_Base Navigation: roslaunch paintingrobot_navigation paintingrobot_navigation.launch
 
 ## 安装项目依赖项
-cd ~/<workspace>/src
+cd ~/${workspace}/src
 rosdep install -y --from-paths . --ignore-src --rosdistro melodic
 
 ## 
