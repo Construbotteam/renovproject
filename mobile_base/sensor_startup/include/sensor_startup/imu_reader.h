@@ -5,7 +5,6 @@
 #include <sstream>
 #include <string>
 
-#include "angles/angles.h"
 #include "ros/ros.h"
 #include "sensor_msgs/Imu.h"
 #include "serial/serial.h"
@@ -39,45 +38,27 @@ class ImuReader {
  public:
   ImuReader(ros::NodeHandle& nh, ros::NodeHandle& nh_private);
   ~ImuReader() {}
-  /**
-   * @brief initialize serial port by pre-set parameters
-   */
-  void serialInit();
-  /**
-   * @brief Initialize parameters
-   * @param nh_private Private node handle used to read params from ros param
-   * list
-   */
-  void paramInit(ros::NodeHandle& nh_private);
-  /**
-   * @brief Loop of reading data from imu 
-   * @param rostimer
-   */
-  void readDataCallback(const ros::TimerEvent&);
-  /**
-   * @brief Transform data from hex to readable dec and publish them
-   * @param data hex data read from imu buffer
-   */
-  void dataParser(const std::vector<uint8_t>& data);
-  /**
-   * @brief Transform three-byte data to integer 
-   * @return Readable angular parameters 
-   */
-  int converter(const uint8_t a, const uint8_t b, const uint8_t c);
+  void TestReader();
+  void SerialInit();
+  void ParamInit(ros::NodeHandle& nh_private);
+  void ReadDataCallback(const ros::TimerEvent&);
+  void DataParser(const std::vector<uint8_t>& data);
+  int Converter(const uint8_t a, const uint8_t b, const uint8_t c);
 
  private:
-  std::string port_id_;
-  int baud_rate_;
-  std::string imu_frame_id_;
-  std::string imu_pub_topic_;
-  bool use_request_;
-  int output_freq_;
-  bool use_debug_;
+  /* PARAMETERS */
+  std::string port_id;
+  int baud_rate;
+  std::string imu_frame_id;
+  std::string imu_pub_topic;
+  bool use_request;
+  int output_freq;
+  bool use_debug;
 
-  ImuCommand cmd_;
-  serial::Serial imu_ser_;
-  ros::Publisher imu_pub_;
-  ros::Timer imu_timer_;
+  ImuCommand cmd;
+  serial::Serial imu_ser;
+  ros::Publisher imu_pub;
+  ros::Timer imu_timer;
 };  // class ImuReader
 
 }  // namespace mobile_base
