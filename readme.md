@@ -10,6 +10,7 @@
 cd ~/<workspace>/src
 rosdep install -y --from-paths . --ignore-src --rosdistro melodic
 
+## 
 修改/添加 传感器、执行器：paintingrobot_description/urdf/paintingrobot_witharm.xacro
 修改机器人urdf：paintingrobot_description/urdf/base/
 修改传感器参数：paintingrobot_description/urdf/sensors/
