@@ -2,9 +2,9 @@
 <launch>
   <node pkg="sensor_startup" type="driver_controller_ros_node" name="driver_controller_ros_node" output="screen">
     <param name="joint_state_pub_topic" value="motor_joint_state" />
-    <param name="can_config_address" value="/config/kinco/can_config.yaml" />
-    <param name="driver_config_address" value="/config/kinco/driver_config.yaml" />
-    <param name="base_file_address" value="/data/ros/renov_robot_ws/src/renov_robot/sensor_startup" />
+    <param name="can_config_address" value="/param/kinco/can_config.yaml" />
+    <param name="driver_config_address" value="/param/kinco/driver_config.yaml" />
+    <param name="base_file_address" value="$(find sensor_startup)" />
     <param name="if_debug" value="true" />
     <remap from="cmd_vel_base" to="cmd_base_joint" />
   </node>
