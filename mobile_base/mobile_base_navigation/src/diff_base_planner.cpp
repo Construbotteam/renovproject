@@ -1,16 +1,17 @@
+#include <fstream>
+
 #include "base_local_planner/trajectory_planner_ros.h"
 #include "costmap_2d/costmap_2d.h"
 #include "costmap_2d/costmap_2d_ros.h"
 #include "global_planner/planner_core.h"
+#include "mobile_base_navigation/broke_line.h"
 #include "mobile_base_navigation/diff_planner.h"
 #include "nav_core/base_global_planner.h"
 #include "nav_msgs/Path.h"
 #include "ros/ros.h"
+#include "sensor_msgs/JointState.h"
 #include "tf/tf.h"
 #include "tf2_ros/transform_listener.h"
-#include "mobile_base_navigation/broke_line.h"
-
-#include <fstream>
 
 namespace mobile_base {
 
@@ -33,6 +34,7 @@ class MobileBasePlannerROS {
   double angular_arrival_tolerance_;
 
   std::string path_pub_topic_, cmd_vel_pub_topic_, goal_sub_topic_;
+  std::string js_pub_topic_;
   std::string path_frame_id_, map_frame_id_, base_frame_id_;
 
   std::string global_costmap_namespace_, local_costmap_namespace_;
@@ -40,7 +42,7 @@ class MobileBasePlannerROS {
       local_planner_namespace_;
 
   ros::Publisher path_pub_, smooth_path_pub_, cmd_vel_pub_;
-  ros::Publisher new_path_pub_;
+  ros::Publisher new_path_pub_, js_pub_;
   ros::Subscriber goal_sub_;
   ros::Timer plan_timer_;
 
@@ -60,6 +62,11 @@ class MobileBasePlannerROS {
   ros::Time way_block_time_;
 
   std::ofstream out_;
+  MoveState pre_state_;
+
+  // front-rear-track, left-right-track
+  double fr_track_, lr_track_, wheel_radius_;
+  double pure_rot_r_, pure_rot_turn_, pure_rot_v_;
 };
 
 MobileBasePlannerROS::MobileBasePlannerROS(ros::NodeHandle& nh,
@@ -69,6 +76,13 @@ MobileBasePlannerROS::MobileBasePlannerROS(ros::NodeHandle& nh,
   ParamInit(nh_private);
   way_block_time_ = ros::Time::now();
   global_plan_.clear();
+  pre_state_ = mobile_base::PureRotation;
+
+  /**/
+  pure_rot_r_ = 0.5 * hypot(fr_track_, lr_track_);
+  pure_rot_turn_ = fabs(atan(fr_track_ / lr_track_));
+  /**/
+
   out_.open("/home/glh/Desktop/valid.txt", std::ios::app);
   out_.clear();
   // init global costmap and global_planner
@@ -97,6 +111,7 @@ MobileBasePlannerROS::MobileBasePlannerROS(ros::NodeHandle& nh,
   // create publisher, subscriber and timer
   path_pub_ = nh.advertise<nav_msgs::Path>(path_pub_topic_, 10);
   new_path_pub_ = nh.advertise<nav_msgs::Path>("new_path", 10);
+  js_pub_ = nh.advertise<sensor_msgs::JointState>(js_pub_topic_, 10);
   // smooth_path_pub_ = nh.advertise<nav_msgs::Path>("smooth_path", 10);
   goal_sub_ = nh.subscribe(goal_sub_topic_, 10,
                            &MobileBasePlannerROS::GetGoalCallback, this);
@@ -122,6 +137,8 @@ void MobileBasePlannerROS::ParamInit(ros::NodeHandle& nh_private) {
 
   nh_private.param("path_pub_topic", path_pub_topic_,
                    std::string("mobile_base_path"));
+  nh_private.param("js_pub_topic", js_pub_topic_,
+                   std::string("base_joint_state"));
   nh_private.param("goal_sub_topic", goal_sub_topic_,
                    std::string("mobile_base_goal"));
   nh_private.param("cmd_vel_pub_topic", cmd_vel_pub_topic_,
@@ -144,6 +161,9 @@ void MobileBasePlannerROS::ParamInit(ros::NodeHandle& nh_private) {
   ROS_INFO("plan freq : %.3f", plan_frequency_);
   nh_private.param("angular_arrival_tolerance", angular_arrival_tolerance_,
                    0.07);
+  nh_private.param("fr_track", fr_track_, 0.5);
+  nh_private.param("lr_track", lr_track_, 0.395);
+  nh_private.param("wheel_radius", wheel_radius_, 0.15 / 2);
 }
 
 void MobileBasePlannerROS::GetGoalCallback(
@@ -153,11 +173,6 @@ void MobileBasePlannerROS::GetGoalCallback(
 }
 
 void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
-  // if (!if_get_goal_) {
-  //   // ROS_WARN("Please provide a goal point!!!");
-  //   return;
-  // }
-
   tf2_ros::Buffer tf_buffer;
   tf2_ros::TransformListener tf_listener(tf_buffer);
   geometry_msgs::TransformStamped tfs;
@@ -230,90 +245,91 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
     ROS_WARN("compute velo failure");
     return;
   }
-  double v_check, vth_check;
+  double vx_check, vy_check;
   // v_check = command_velo.linear.x;
-  
-  v_check =
-      std::max(fabs(command_velo.linear.x), diff_local_planner_.getMaxV());
-  vth_check = sign(command_velo.angular.z) *
-              std::max(fabs(command_velo.angular.z),
-                       diff_local_planner_.getMaxThetaV());
 
-  valid_traj_ = base_local_planner_.checkTrajectory(v_check, 0.0, vth_check);
+  double angle_tmp = command_velo.angular.z;
+  vx_check = command_velo.linear.x * cos(angle_tmp);
+  vy_check = command_velo.linear.x * sin(angle_tmp);
+
+  vx_check =
+      sign(vx_check) *
+      std::max(fabs(vx_check), diff_local_planner_.getMaxV() * cos(angle_tmp));
+  vy_check =
+      sign(vy_check) *
+      std::max(fabs(vy_check), diff_local_planner_.getMaxV() * sin(angle_tmp));
+
+  valid_traj_ = base_local_planner_.checkTrajectory(vx_check, vy_check, 0.0);
   if (valid_traj_) {
     way_block_time_ = ros::Time::now();
   }
   diff_local_planner_.getCollision(!valid_traj_);
 
-  cmd_vel_pub_.publish(command_velo);
-}
+  MoveState cur_state = diff_local_planner_.getMoveState();
 
-bool MobileBasePlannerROS::StraightPlan(const geometry_msgs::PoseStamped& start,
-                                        const geometry_msgs::PoseStamped& goal,
-                                        nav_msgs::Path* path) {
-  double x1, x2, y1, y2;
-  x1 = start.pose.position.x;
-  y1 = start.pose.position.y;
-  x2 = goal.pose.position.x;
-  y2 = goal.pose.position.y;
+  sensor_msgs::JointState js_msg;
+  js_msg.header.frame_id = "wheel";
+  js_msg.header.stamp = ros::Time::now();
+  js_msg.name.resize(8);
+  js_msg.name = {"w1", "w2", "w3", "w4", "s1", "s2", "s3", "s4"};
+  js_msg.position.resize(8);
+  js_msg.velocity.resize(8);
 
-  path->header.frame_id = map_frame_id_;
-  path->header.stamp = ros::Time::now();
-  path->poses.clear();
-  path->poses.push_back(start);
-
-  double angle = atan2(y2 - y1, x2 - x1);
-  double dis_increment = 0.05;
-  int max_point_num = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2)) / dis_increment;
-  while (true) {
-    double x_tmp =
-        path->poses.back().pose.position.x + cos(angle) * dis_increment;
-    double y_tmp =
-        path->poses.back().pose.position.y + sin(angle) * dis_increment;
-
-    geometry_msgs::PoseStamped path_point;
-    path_point.header = start.header;
-    path_point.pose.position.x = x_tmp;
-    path_point.pose.position.y = y_tmp;
-    // path_point.pose.orientation = tf::createQuaternionMsgFromYaw(angle);
-
-    path->poses.push_back(path_point);
-
-    double rest_dis = sqrt(pow(x2 - x_tmp, 2) + pow(y2 - y_tmp, 2));
-    if (rest_dis < dis_increment) {
-      path->poses.push_back(goal);
-      break;
-    }
-    if (path->poses.size() > max_point_num * 2) {
-      ROS_WARN("path point num exceeds");
-      return false;
-    }
-  }
-  for (size_t i = 0; i < path->poses.size() - 1; i++) {
-    path->poses[i].pose.orientation = tf::createQuaternionMsgFromYaw(angle);
-  }
-
-  costmap_2d::Costmap2D* costmap_tmp = global_costmap_ros_ptr_->getCostmap();
-  for (size_t i = 0; i < path->poses.size(); i++) {
-    double wx = path->poses[i].pose.position.x;
-    double wy = path->poses[i].pose.position.y;
-    unsigned int mx, my;
-    unsigned int cost_val;
-    if (costmap_tmp->worldToMap(wx, wy, mx, my)) {
-      cost_val = costmap_tmp->getCost(mx, my);
-      if (0 != cost_val) {
-        ROS_WARN(
-            "a point on the straight path is located in obstacles, get "
-            "straight path failure");
-        return false;
-      }
+  if (cur_state == mobile_base::PureRotation) {
+    pure_rot_v_ = command_velo.angular.z * pure_rot_r_ / wheel_radius_;
+    if (cur_state != pre_state_) {
+      js_msg.velocity = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+      js_msg.position = {
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -pure_rot_turn_,
+          pure_rot_turn_,
+          pure_rot_turn_,
+          -pure_rot_turn_,
+      };
+      pre_state_ = cur_state;
+      js_pub_.publish(js_msg);
+      ros::Duration(1.5).sleep();
+      return;
     } else {
-      ROS_WARN("unable to get cost value!!");
-      return false;
+      js_msg.velocity = {-pure_rot_v_, pure_rot_v_, -pure_rot_v_, pure_rot_v_,
+                         0.0,          0.0,         0.0,          0.0};
+      js_msg.position = {
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -pure_rot_turn_,
+          pure_rot_turn_,
+          pure_rot_turn_,
+          -pure_rot_turn_,
+      };
+    }
+  } else if (cur_state == mobile_base::MoveForward) {
+    if (cur_state != pre_state_) {
+      js_msg.velocity = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+      js_msg.position = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+
+      pre_state_ = cur_state;
+      js_pub_.publish(js_msg);
+      ros::Duration(1.5).sleep();
+      return;
+    } else {
+      double turn = command_velo.angular.z;
+      double vx = command_velo.linear.x / wheel_radius_ / (2 * M_PI) * 60;
+      // remember to remove this
+      vx = std::min(16.0, vx);
+      js_msg.velocity = {vx, vx, vx, vx, 0.0, 0.0, 0.0, 0.0};
+      js_msg.position = {0.0, 0.0, 0.0, 0.0, turn, turn, turn, turn};
     }
   }
-  return true;
+
+  js_pub_.publish(js_msg);
+  // cmd_vel_pub_.publish(command_velo);
 }
+
 };  // namespace mobile_base
 
 int main(int argc, char** argv) {

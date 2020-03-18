@@ -10,14 +10,14 @@
 #include "angles/angles.h"
 #include "costmap_2d/costmap_2d_ros.h"
 #include "geometry_msgs/Twist.h"
+#include "mobile_base_navigation/velo_generator.h"
 #include "nav_core/base_local_planner.h"
 #include "ros/ros.h"
+#include "sensor_msgs/JointState.h"
 #include "tf/tf.h"
 #include "tf2/utils.h"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
-
-#include "mobile_base_navigation/velo_generator.h"
 
 namespace mobile_base {
 
@@ -45,6 +45,8 @@ struct ControlError {
   double integ_err_;
 };  // struct ControlError
 
+enum MoveState { MoveForward, PureRotation };  // enum MoveState
+
 class DiffPlanner : public nav_core::BaseLocalPlanner {
  public:
   DiffPlanner();
@@ -69,6 +71,7 @@ class DiffPlanner : public nav_core::BaseLocalPlanner {
   double getMinV();
   double getMaxThetaV();
   double getMinThetaV();
+  MoveState getMoveState();
 
   void rotateToGoal(const geometry_msgs::PoseStamped &global_pose,
                     const double &goal_yaw, geometry_msgs::Twist &cmd_vel);
@@ -114,6 +117,8 @@ class DiffPlanner : public nav_core::BaseLocalPlanner {
   // tracking error includes [0]x_err, [1]y_err, [2]yaw_err
   ControlError track_e_[3], rot_e_, v_err_;
   VeloGenerator *velo_generator_;
+
+  MoveState move_state_;
 };  // class DiffPlanner
 
 }  // namespace mobile_base

@@ -195,16 +195,19 @@ bool DiffPlanner::computeVelocityCommands(geometry_msgs::Twist& cmd_vel) {
   if (fabs(yaw_diff) < yaw_goal_tolerance_ &&
       fabs(pose_goal_dis) < xy_goal_tolerance_) {
     brake(cmd_vel);
+    move_state_ = mobile_base::PureRotation;
     goal_reached_ = true;
     return true;
   } else if (fabs(pose_goal_dis) < xy_goal_tolerance_) {
     rotateToGoal(global_pose, goal_yaw, cmd_vel);
     moveWithLimit(cmd_vel);
+    move_state_ = mobile_base::PureRotation;
     pre_cmd_ = cmd_vel;
     return true;
   } else {
     moveToGoalPid(global_pose, cmd_vel);
     moveWithLimit(cmd_vel);
+    move_state_ = mobile_base::MoveForward;
     pre_cmd_ = cmd_vel;
     return true;
   }
@@ -271,18 +274,15 @@ void DiffPlanner::moveToGoalPid(const geometry_msgs::PoseStamped& global_pose,
   }
   cmd_vel.linear.x = pre_cmd_.linear.x + incrementPid(v_pid_, v_err_);
 
-  cmd_vel.angular.z =
-      purePursuit(global_pose, original_plan_[forward_index], cmd_vel.linear.x);
+  double turning_angle = atan2(y_err_base, x_err_base);
+  turning_angle = sign(turning_angle) * std::min(fabs(turning_angle), M_PI / 2);
+
+  cmd_vel.angular.z = turning_angle;
+
   // compute theta velocity
   // theta velocity = pid(y_err)
   track_e_[1].err_ = y_err_base;
   // track_e_[2].err_ = yaw_err_base;
-  cmd_vel.angular.z = cmd_vel.angular.z + incrementPid(track_pid_, track_e_[1]);
-  //                     incrementPid(th_pid_, track_e_[2]);
-
-  // incrementPid(track_pid_, track_e_[1]) +
-  // incrementPid(x_pid_, track_e_[0]) +
-  // theta_coeff_ * incrementPid(track_pid_, track_e_[2]);
 
   // update the pre_err and pre_pre_err
   for (size_t i = 0; i < 3; i++) {
@@ -483,5 +483,7 @@ double DiffPlanner::getMinV() { return min_v_; }
 double DiffPlanner::getMaxThetaV() { return max_theta_v_; }
 
 double DiffPlanner::getMinThetaV() { return min_theta_v_; }
+
+MoveState DiffPlanner::getMoveState() { return move_state_; }
 
 }  // namespace mobile_base
