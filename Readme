@@ -1,4 +1,4 @@
-#联合仿真：roslaunch paintingrobot_description bringup_moveit.launch 
+## 联合仿真：roslaunch paintingrobot_description bringup_moveit.launch 
 ## 修改gazebo的环境：/paintingrobot_description/launch/gazebo_world.launch
 ## 只在rviz中显示模型：roslaunch paintingrobot_description display.launch 
 ## Gazebo仿真： roslaunch paintingrobot_description bringup_gazebo.launch
