@@ -6,8 +6,9 @@
 ## 保存地图： rosrun map_server map_saver -f <文件保存路径>/<文件name>
 ## Move_Base Navigation: roslaunch paintingrobot_navigation paintingrobot_navigation.launch
 
-## 安装项目依赖项
+## 安装项目依赖项：
 cd ~/${workspace}/src
+
 rosdep install -y --from-paths . --ignore-src --rosdistro melodic
 
 ## 
