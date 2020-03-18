@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(base_navigation)
+project(mobile_base_navigation)
 
 add_compile_options(-std=c++11)
 
