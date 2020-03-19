@@ -138,7 +138,7 @@ void MobileBasePlannerROS::ParamInit(ros::NodeHandle& nh_private) {
   nh_private.param("path_pub_topic", path_pub_topic_,
                    std::string("mobile_base_path"));
   nh_private.param("js_pub_topic", js_pub_topic_,
-                   std::string("base_joint_state"));
+                   std::string("cmd_base_joint"));
   nh_private.param("goal_sub_topic", goal_sub_topic_,
                    std::string("mobile_base_goal"));
   nh_private.param("cmd_vel_pub_topic", cmd_vel_pub_topic_,
@@ -189,12 +189,15 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
 
   std::vector<geometry_msgs::PoseStamped> new_path;
 
-  bool plan_again;
+  bool plan_again = false;
   if (!if_reach_goal_) {
     plan_again = fabs(ros::Time::now().toSec() - way_block_time_.toSec()) > 1.0;
   } else {
     plan_again = false;
   }
+
+  plan_again = false;
+
 
   if (if_get_goal_ || plan_again) {
     global_plan_.clear();

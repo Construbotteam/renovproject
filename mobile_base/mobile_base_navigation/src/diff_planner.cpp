@@ -175,11 +175,13 @@ bool DiffPlanner::computeVelocityCommands(geometry_msgs::Twist& cmd_vel) {
 
     if (fabs(first_rot_yaw_diff) < yaw_goal_tolerance_) {
       brake(cmd_vel);
+      move_state_ = mobile_base::PureRotation;
       resetControlParam();
       ROS_ERROR("finish first rot");
       rotate_to_first_pose_ = false;
     } else {
       rotateToGoal(global_pose, first_rot_goal_yaw, cmd_vel);
+      move_state_ = mobile_base::PureRotation;
       moveWithLimit(cmd_vel);
       pre_cmd_ = cmd_vel;
       // ROS_INFO("show me the vel : %.4f", cmd_vel.angular.z);
