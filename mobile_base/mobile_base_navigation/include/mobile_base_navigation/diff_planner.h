@@ -105,7 +105,7 @@ class DiffPlanner : public nav_core::BaseLocalPlanner {
   ros::Time start_time_;
 
   bool initialized_, debug_, crash_;
-  bool goal_reached_, rotate_to_first_pose_;
+  bool point_reached_, goal_reached_, rotate_to_first_pose_;
 
   double max_v_, min_v_, max_theta_v_, min_theta_v_, pure_rotation_max_theta_v_;
   double acc_x_limit_, acc_y_limit_, acc_theta_limit_;

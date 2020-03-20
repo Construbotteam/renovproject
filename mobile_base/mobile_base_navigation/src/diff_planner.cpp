@@ -7,6 +7,7 @@ int sign(const double& var) { return var > 0.0 ? 1 : -1; }
 DiffPlanner::DiffPlanner()
     : initialized_(false),
       goal_reached_(false),
+      point_reached_(false),
       rotate_to_first_pose_(false),
       crash_(false),
       tf_(NULL),
@@ -18,6 +19,7 @@ DiffPlanner::DiffPlanner(std::string name, tf2_ros::Buffer* tf,
                          costmap_2d::Costmap2DROS* costmap_ros)
     : initialized_(false),
       goal_reached_(false),
+      point_reached_(false),
       rotate_to_first_pose_(false),
       crash_(false),
       tf_(NULL),
@@ -199,14 +201,16 @@ bool DiffPlanner::computeVelocityCommands(geometry_msgs::Twist& cmd_vel) {
     brake(cmd_vel);
     move_state_ = mobile_base::PureRotation;
     goal_reached_ = true;
+    point_reached_ = false;
     return true;
   } else if (fabs(pose_goal_dis) < xy_goal_tolerance_) {
     rotateToGoal(global_pose, goal_yaw, cmd_vel);
     moveWithLimit(cmd_vel);
     move_state_ = mobile_base::PureRotation;
     pre_cmd_ = cmd_vel;
+    point_reached_ = true;
     return true;
-  } else {
+  } else if (!point_reached_) {
     moveToGoalPid(global_pose, cmd_vel);
     moveWithLimit(cmd_vel);
     move_state_ = mobile_base::MoveForward;

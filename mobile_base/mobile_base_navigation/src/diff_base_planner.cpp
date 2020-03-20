@@ -294,7 +294,7 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
       };
       pre_state_ = cur_state;
       js_pub_.publish(js_msg);
-      ros::Duration(1.5).sleep();
+      ros::Duration(2.0).sleep();
       return;
     } else {
       js_msg.velocity = {-pure_rot_v_, pure_rot_v_, -pure_rot_v_, pure_rot_v_,
@@ -317,7 +317,7 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
 
       pre_state_ = cur_state;
       js_pub_.publish(js_msg);
-      ros::Duration(1.5).sleep();
+      ros::Duration(2.0).sleep();
       return;
     } else {
       double turn = command_velo.angular.z;
