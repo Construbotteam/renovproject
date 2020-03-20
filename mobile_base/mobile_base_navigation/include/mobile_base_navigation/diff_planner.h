@@ -39,6 +39,12 @@ struct PidParam {
 struct ControlError {
   ControlError()
       : err_(0.0), pre_err_(0.0), pre_pre_err_(0.0), integ_err_(0.0) {}
+  void reset() { err_ = pre_err_ = pre_pre_err_ = integ_err_ = 0.0; }
+  void update() {
+    pre_pre_err_ = pre_err_;
+    pre_err_ = err_;
+    integ_err_ += err_;
+  }
   double err_;
   double pre_err_;
   double pre_pre_err_;

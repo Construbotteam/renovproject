@@ -288,12 +288,9 @@ void DiffPlanner::moveToGoalPid(const geometry_msgs::PoseStamped& global_pose,
 
   // update the pre_err and pre_pre_err
   for (size_t i = 0; i < 3; i++) {
-    track_e_[i].integ_err_ += track_e_[i].err_;
-    track_e_[i].pre_pre_err_ = track_e_[i].pre_err_;
-    track_e_[i].pre_err_ = track_e_[i].err_;
+    track_e_[i].update();
   }
-  v_err_.pre_pre_err_ = v_err_.pre_err_;
-  v_err_.pre_err_ = v_err_.err_;
+  v_err_.update();
 }
 
 double DiffPlanner::findDistance(const geometry_msgs::PoseStamped& pose1,
@@ -305,7 +302,7 @@ double DiffPlanner::findDistance(const geometry_msgs::PoseStamped& pose1,
   x2 = pose2.pose.position.x;
   y2 = pose2.pose.position.y;
 
-  return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+  return hypot(x1 - x2, y1 - y2);
 }
 
 double DiffPlanner::findRestJourney(const uint& cur_index) {
@@ -385,11 +382,10 @@ void DiffPlanner::rotateToGoal(const geometry_msgs::PoseStamped& global_pose,
 void DiffPlanner::resetControlParam() {
   // reset the tracking errors and control commands to zero
   for (size_t i = 0; i < 3; i++) {
-    track_e_[i].err_ = track_e_[i].pre_err_ = track_e_[i].pre_pre_err_ =
-        track_e_[i].integ_err_ = 0.0;
+    track_e_[i].reset();
   }
-  rot_e_.err_ = rot_e_.pre_err_ = rot_e_.pre_pre_err_ = 0.0;
-  v_err_.err_ = v_err_.pre_err_ = v_err_.pre_pre_err_ = 0.0;
+  rot_e_.reset();
+  v_err_.reset();
 
   // pre_angular_v_ = 0.0;
   pre_cmd_.linear.x = pre_cmd_.linear.y = pre_cmd_.linear.z =
@@ -439,9 +435,16 @@ void DiffPlanner::moveWithLimit(geometry_msgs::Twist& cmd_vel) {
   cmd_vel.linear.x = cmd_vel.linear.x > 0 ? std::min(cmd_vel.linear.x, max_v_)
                                           : std::max(cmd_vel.linear.x, -max_v_);
 
-  cmd_vel.angular.z = cmd_vel.angular.z > 0
-                          ? std::min(cmd_vel.angular.z, max_theta_v_)
-                          : std::max(cmd_vel.angular.z, -max_theta_v_);
+  if (move_state_ == PureRotation) {
+    cmd_vel.angular.z =
+        cmd_vel.angular.z > 0
+            ? std::min(cmd_vel.angular.z, pure_rotation_max_theta_v_)
+            : std::max(cmd_vel.angular.z, -pure_rotation_max_theta_v_);
+  } else if (move_state_ == MoveForward) {
+    cmd_vel.angular.z = cmd_vel.angular.z > 0
+                            ? std::min(cmd_vel.angular.z, M_PI / 2)
+                            : std::max(cmd_vel.angular.z, -M_PI / 2);
+  }
 
   // the acceleration limit
   if (fabs(acc_linear) > acc_x_limit_) {
