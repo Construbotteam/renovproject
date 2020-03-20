@@ -1,0 +1,24 @@
+<launch>
+    <!-- 不使用仿真时间 -->
+    <param name="/use_sim_time" value="false" />
+
+    <!-- 启动 arbotix driver-->
+    <arg name="sim" default="true" />
+
+    <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find painting_robot_description)/urdf/paintingrobot_description_witharm.urdf'" />
+
+    <node name="arbotix" pkg="arbotix_python" type="arbotix_driver" output="screen">
+        <rosparam file="$(find painting_robot_description)/config/painting_robot.yaml" command="load" />
+        <param name="sim" value="true"/>
+    </node>
+
+    <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
+
+    <include file="$(find paintingrobot_moveit_config)/launch/move_group.launch" />
+
+    <!-- 启动rviz可视化界面 -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find paintingrobot_description)/urdf.rviz" />
+
+</launch>
