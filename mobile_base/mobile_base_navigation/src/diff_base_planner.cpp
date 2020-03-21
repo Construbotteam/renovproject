@@ -29,7 +29,7 @@ class MobileBasePlannerROS {
 
  private:
   bool if_use_local_planner_, if_get_goal_, if_reach_goal_;
-  bool valid_traj_;
+  bool valid_traj_, send_stop_flag_;
   double plan_frequency_;
   double angular_arrival_tolerance_;
 
@@ -72,7 +72,11 @@ class MobileBasePlannerROS {
 MobileBasePlannerROS::MobileBasePlannerROS(ros::NodeHandle& nh,
                                            ros::NodeHandle& nh_private,
                                            tf2_ros::Buffer& bf)
-    : bf_(bf), if_get_goal_(false), if_reach_goal_(false), valid_traj_(true) {
+    : bf_(bf),
+      if_get_goal_(false),
+      if_reach_goal_(false),
+      valid_traj_(true),
+      send_stop_flag_(false) {
   ParamInit(nh_private);
   way_block_time_ = ros::Time::now();
   global_plan_.clear();
@@ -169,14 +173,11 @@ void MobileBasePlannerROS::ParamInit(ros::NodeHandle& nh_private) {
 void MobileBasePlannerROS::GetGoalCallback(
     const geometry_msgs::PoseStamped& goal_pose) {
   goal_pose_ = goal_pose;
+  send_stop_flag_ = false;
   if_get_goal_ = true;
 }
 
 void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
-  tf2_ros::Buffer tf_buffer;
-  tf2_ros::TransformListener tf_listener(tf_buffer);
-  geometry_msgs::TransformStamped tfs;
-
   // ROS_INFO("get robot pose: %.4f", ros::Time::now().toSec());
   geometry_msgs::PoseStamped start;
   if (!global_costmap_ros_ptr_->getRobotPose(start)) {
@@ -189,7 +190,7 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
 
   std::vector<geometry_msgs::PoseStamped> new_path;
 
-  bool plan_again = false;
+  bool plan_again;
   if (!if_reach_goal_) {
     plan_again = fabs(ros::Time::now().toSec() - way_block_time_.toSec()) > 1.0;
   } else {
@@ -197,7 +198,6 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
   }
 
   plan_again = false;
-
 
   if (if_get_goal_ || plan_again) {
     global_plan_.clear();
@@ -210,7 +210,6 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
     } else if (global_plan_.size() < 2 ||
                !diff_local_planner_.setPlan(new_path) ||
                !base_local_planner_.setPlan(new_path)) {
-      //  !diff_local_planner_.setPlan(global_plan_)) {
       ROS_WARN("length of global plan is %d or set plan failure",
                (int)global_plan_.size());
       return;
@@ -219,6 +218,7 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
       ROS_INFO("make global plan and set it local planner");
     }
     if_get_goal_ = false;
+
   } else if (global_plan_.size() < 2) {
     return;
   }
@@ -241,6 +241,14 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
                          tf::getYaw(final_pose.pose.orientation);
     ROS_INFO("goal reached, position err : %.4f,  angular err : %.4f",
              position_err, angular_err / M_PI * 180.0);
+
+    int stop_flag = 1;
+    if (!send_stop_flag_) {
+      ros::param::set("search_port/mobile_tracking_stop_flag", stop_flag);
+      send_stop_flag_ = true;
+    }
+
+    ros::Duration(2.0).sleep();
     return;
   }
 

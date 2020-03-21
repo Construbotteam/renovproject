@@ -197,13 +197,13 @@ bool DiffPlanner::computeVelocityCommands(geometry_msgs::Twist& cmd_vel) {
   double yaw_diff = angles::shortest_angular_distance(cur_yaw, goal_yaw);
   double pose_goal_dis = findDistance(global_pose, original_plan_.back());
   if (fabs(yaw_diff) < yaw_goal_tolerance_ &&
-      fabs(pose_goal_dis) < xy_goal_tolerance_) {
+      (fabs(pose_goal_dis) < xy_goal_tolerance_ || point_reached_)) {
     brake(cmd_vel);
     move_state_ = mobile_base::PureRotation;
     goal_reached_ = true;
     point_reached_ = false;
     return true;
-  } else if (fabs(pose_goal_dis) < xy_goal_tolerance_) {
+  } else if (fabs(pose_goal_dis) < xy_goal_tolerance_ || point_reached_) {
     rotateToGoal(global_pose, goal_yaw, cmd_vel);
     moveWithLimit(cmd_vel);
     move_state_ = mobile_base::PureRotation;
