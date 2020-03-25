@@ -10,6 +10,16 @@
 cd ~/${workspace}/src
 
 rosdep install -y --from-paths . --ignore-src --rosdistro melodic
+or
+rosdep install -y --from-paths . --ignore-src --rosdistro kinetic
+
+sudo apt-get install ros-kinetic-ros-control
+
+sudo apt-get install ros-kinetic-ros-controllers
+
+sudo apt-get install ros-kinetic-gazebo-ros
+
+sudo apt-get install ros-kinetic-gazebo-ros-control
 
 ## 
 修改/添加 传感器、执行器：paintingrobot_description/urdf/paintingrobot_witharm.xacro
