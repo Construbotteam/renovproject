@@ -10,7 +10,7 @@
 cd ~/${workspace}/src
 
 rosdep install -y --from-paths . --ignore-src --rosdistro melodic
-or
+OR
 rosdep install -y --from-paths . --ignore-src --rosdistro kinetic
 
 sudo apt-get install ros-kinetic-ros-control
