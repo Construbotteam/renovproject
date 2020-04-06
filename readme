@@ -1,0 +1,13 @@
+this is a tutorial, which helps me learn how to make visualizing collisions.
+
+moveit！教程链接：
+http://docs.ros.org/kinetic/api/moveit_tutorials/html/doc/getting_started/getting_started.html
+
+修改部分：
+/home/apple/ws_moveit/src/moveit_tutorials/doc/visualizing_collisions/src/visualizing_collisions_tutorial.cpp
+
+参考代码：
+https://github.com/Danfoa/invite-robotics/wiki/Tutorial---Simulation-Scene-Objects
+
+碰撞检测：
+roslaunch moveit_tutorials visualizing_collisions_tutorial.launch
