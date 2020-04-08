@@ -1,8 +1,9 @@
-# 日志
+# Update
 ## 2020.04.06
-- 增加ORB SLAM建图
-- 添加测试环境room.world
-- 机器人模型增加ground truth
+- 增加ORB SLAM2建图``roslaunch paintingrobot_slam paintingrobot_orbslam2.launch``
+- 增加Cartographer建图`` roslaunch paintingrobot_slam paintingrobot_cartographer.launch``
+- 添加测试环境room.world 默认在这个环境测试
+- 机器人模型增加ground truth输出 ``rostopic echo -p /ground_truth/state > ~/groundtruth.txt``
 
 ---
 
