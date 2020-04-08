@@ -1,36 +1,42 @@
-## 联合仿真：roslaunch paintingrobot_description bringup_moveit.launch 
-## 修改gazebo的环境：/paintingrobot_description/launch/gazebo_world.launch
-## 只在rviz中显示模型：roslaunch paintingrobot_description display.launch 
-## Gazebo仿真： roslaunch paintingrobot_description bringup_gazebo.launch
-## Gmapping SLAM建图: roslaunch paintingrobot_slam paintingrobot_slam.launch
-## 保存地图： rosrun map_server map_saver -f <文件保存路径>/<文件name>
-## Navigation： roslaunch paintingrobot_navigation paintingrobot_navigation.launch
+# 日志
+## 2020.04.06
+- 增加ORB SLAM建图
+- 添加测试环境room.world
+- 机器人模型增加ground truth
+
+---
+
+# 使用说明
 
 ## 安装项目依赖项：
+```
 cd ~/${workspace}/src
 
-rosdep install -y --from-paths . --ignore-src --rosdistro melodic
-OR
-rosdep install -y --from-paths . --ignore-src --rosdistro kinetic
+rosdep install -y --from-paths . --ignore-src --rosdistro $ROS_DISTRO
 
-sudo apt-get install ros-kinetic-ros-control
+sudo apt install ros-$ROS_DISTRO-ros-control ros-$ROS_DISTRO-ros-controllers ros-$ROS_DISTRO-gazebo-ros ros-$ROS_DISTRO-gazebo-ros-control
+```
 
-sudo apt-get install ros-kinetic-ros-controllers
+## 功能介绍
 
-sudo apt-get install ros-kinetic-gazebo-ros
+- 联合仿真：``roslaunch paintingrobot_description bringup_moveit.launch ``
+- 修改gazebo的环境：``/paintingrobot_description/launch/gazebo_world.launch``
+- 只在rviz中显示模型：``roslaunch paintingrobot_description display.launch ``
+- Gazebo仿真：``roslaunch paintingrobot_description bringup_gazebo.launch``
+- Gmapping SLAM建图:``roslaunch paintingrobot_slam paintingrobot_slam.launch``
+- 保存地图：``rosrun map_server map_saver -f <文件保存路径>/<文件name>``
+- Navigation：``roslaunch paintingrobot_navigation paintingrobot_navigation.launch``
+- 修改/添加 传感器、执行器：``paintingrobot_description/urdf/paintingrobot_witharm.xacro``
+- 修改机器人urdf：``paintingrobot_description/urdf/base/``
+- 修改传感器参数：``paintingrobot_description/urdf/sensors/``
+- 在rviz中可以显示相应传感器数据（可以在传感器xacro文件修改对应topic命名空间）：
 
-sudo apt-get install ros-kinetic-gazebo-ros-control
-
-## 
-修改/添加 传感器、执行器：paintingrobot_description/urdf/paintingrobot_witharm.xacro
-修改机器人urdf：paintingrobot_description/urdf/base/
-修改传感器参数：paintingrobot_description/urdf/sensors/
-
-在rviz中可以显示相应传感器数据（可以在传感器xacro文件修改对应topic命名空间）：
-激光雷达：
-/scan
-kinect相机：
-
+  - 激光雷达：
+```
+    /scan
+```
+  - kinect相机：
+```
 /kinect/depth/camera_info
 
 /kinect/depth/image_raw
@@ -62,9 +68,10 @@ kinect相机：
 /kinect/rgb/image_raw/theora/parameter_descriptions
 
 /kinect/rgb/image_raw/theora/parameter_updates
+```
 
-zed双目：
-
+  - zed双目：
+```bash
 /zed/depth/camera_info
 
 /zed/depth/image_raw
@@ -96,3 +103,4 @@ zed双目：
 /zed/rgb/image_raw/theora/parameter_descriptions
 
 /zed/rgb/image_raw/theora/parameter_updates
+```
