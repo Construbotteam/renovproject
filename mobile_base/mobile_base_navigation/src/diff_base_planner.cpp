@@ -265,10 +265,10 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
 
   vx_check =
       sign(vx_check) *
-      std::max(fabs(vx_check), diff_local_planner_.getMaxV() * cos(angle_tmp));
+      std::max(fabs(vx_check), diff_local_planner_.getMinV() * cos(angle_tmp));
   vy_check =
       sign(vy_check) *
-      std::max(fabs(vy_check), diff_local_planner_.getMaxV() * sin(angle_tmp));
+      std::max(fabs(vy_check), diff_local_planner_.getMinV() * sin(angle_tmp));
 
   valid_traj_ = base_local_planner_.checkTrajectory(vx_check, vy_check, 0.0);
   if (valid_traj_) {
