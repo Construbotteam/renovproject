@@ -1,6 +1,7 @@
 #ifndef ROOM_LINE_EXTRACTOR
 #define ROOM_LINE_EXTRACTOR
 
+#include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <limits>
 #include <memory>
@@ -28,7 +29,15 @@ struct Pose2d {
  * Another end point of a line which is perpendicular to this line at end
  */
 struct LineParam {
-  //   double k_, b_;
+  void reverse() {
+    Pose2d tmp = start_;
+    start_ = end_;
+    end_ = tmp;
+
+    tmp = e_start_;
+    e_start_ = e_end_;
+    e_end_ = tmp;
+  }
   Pose2d start_, end_;
   Pose2d e_start_, e_end_;
 };  // struct LineParam
@@ -48,9 +57,11 @@ class RoomLineExtractor {
   bool setRooms(const int& num, Pose2d* centers);
   void initVirtualPic(const int& sx, const int& sy, const double& ox,
                       const double& oy, const double& reso);
-  void updateVirtualPic(double* ps, const int& ps_size);
+  void updateVirtualPic(const std::vector<double> ps);
   LineParamVec computeWalls(const int& num, double* tuple, const Pose2d& pose);
   LineParamVec sortLines(const Pose2d& pose, const LineParamVec& param_vec);
+  double point2LineDistance(const double& x, const double& y,
+                            const LineParam& param);
 
   VirtualPic getVirtualPic() { return virtual_pic_; }
   int getRoomQuantity() { return room_num_; }
