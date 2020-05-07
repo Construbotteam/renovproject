@@ -99,7 +99,7 @@
 #include <math.h>
 #include <limits.h>
 #include <float.h>
-#include "lsd.h"
+#include "mobile_base_utility/lsd.h"
 
 /** ln(10) */
 #ifndef M_LN10

@@ -67,6 +67,15 @@ void RoomLineExtractor::updateVirtualPic(const std::vector<double> ps) {
   }
 }
 
+void RoomLineExtractor::resetVirtualPic() {
+  if (init_pic_) {
+    int data_size = virtual_pic_.size_x_ * virtual_pic_.size_y_;
+    for (size_t i = 0; i < data_size; i++) {
+      virtual_pic_.data_[i] = 0.0;
+    }
+  }
+}
+
 LineParamVec RoomLineExtractor::computeWalls(const int& num, double* tuple,
                                              const Pose2d& pose) {
   LineParamVec line_params;
@@ -149,6 +158,7 @@ LineParamVec RoomLineExtractor::sortLines(const Pose2d& pose,
           point_dis_min = point_dis_start;
           index_tmp = i;
         }
+
         if (point_dis_start > point_dis_end && point_dis_end < point_dis_min) {
           reverse_param = true;
           point_dis_min = point_dis_end;

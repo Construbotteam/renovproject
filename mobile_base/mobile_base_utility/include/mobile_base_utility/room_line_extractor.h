@@ -58,13 +58,14 @@ class RoomLineExtractor {
   void initVirtualPic(const int& sx, const int& sy, const double& ox,
                       const double& oy, const double& reso);
   void updateVirtualPic(const std::vector<double> ps);
+  void resetVirtualPic();
   LineParamVec computeWalls(const int& num, double* tuple, const Pose2d& pose);
   LineParamVec sortLines(const Pose2d& pose, const LineParamVec& param_vec);
   double point2LineDistance(const double& x, const double& y,
                             const LineParam& param);
 
-  VirtualPic getVirtualPic() { return virtual_pic_; }
-  int getRoomQuantity() { return room_num_; }
+  VirtualPic getVirtualPic() const { return virtual_pic_; }
+  int getRoomQuantity() const { return room_num_; }
 
  private:
   int room_num_;
