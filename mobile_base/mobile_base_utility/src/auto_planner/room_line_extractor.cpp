@@ -25,6 +25,8 @@ bool RoomLineExtractor::setRooms(const int& num, Pose2d* centers) {
   centers_ = centers;
 
   set_rooms_ = true;
+
+  return true;
 }
 
 void RoomLineExtractor::initVirtualPic(const int& sx, const int& sy,

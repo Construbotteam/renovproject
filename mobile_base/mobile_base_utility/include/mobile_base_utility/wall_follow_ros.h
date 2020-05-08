@@ -43,7 +43,7 @@ class WallFollowROS {
   void planLoop();
 
  private:
-  std::string map_topic_, goal_topic_;
+  std::string map_topic_, goal_topic_, scan_topic_;
   std::string map_frame_id_, base_frame_id_, scan_frame_id_;
 
   // arr -> abbr. of arrival

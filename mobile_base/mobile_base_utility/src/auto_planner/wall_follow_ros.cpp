@@ -12,6 +12,7 @@ WallFollowROS::WallFollowROS(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
   initParam(nh_private);
 
   map_sub_ = nh.subscribe(map_topic_, 10, &WallFollowROS::getMapCallback, this);
+  scan_sub_ = nh.subscribe(scan_topic_, 10, &WallFollowROS::getScanCallback, this);
   goal_pub_ = nh.advertise<geometry_msgs::PoseStamped>(goal_topic_, 10);
   visualizer_.getNodeHandle(nh);
 
@@ -112,8 +113,8 @@ void WallFollowROS::planLoop() {
       visualizer_.showWalls(sequential_walls);
 
       // get way points
-      Pose2dVec way_ponits = getWayPoints(sequential_walls, pose2d);
-      visualizer_.showWayPoints(way_ponits);
+      Pose2dVec way_points = getWayPoints(sequential_walls, pose2d);
+      visualizer_.showWayPoints(way_points);
 
     }  // end of extracting walls into way points
 
@@ -132,11 +133,14 @@ WallFollowROS::~WallFollowROS() {
 
 void WallFollowROS::initParam(ros::NodeHandle& nh_private) {
   nh_private.param("map_topic", map_topic_, std::string("map"));
+  nh_private.param("scan_topic", scan_topic_, std::string("scan"));
+  nh_private.param("goal_topic", goal_topic_, std::string("GoalPoint"));
   nh_private.param("map_frame_id", map_frame_id_, std::string("map"));
   nh_private.param("base_frame_id", base_frame_id_, std::string("base_link"));
   nh_private.param("scan_frame_id", scan_frame_id_, std::string("laser_link"));
   nh_private.param("arr_param_name", arr_param_name_, std::string(""));
   nh_private.param("arr_namespace", arr_namespace_, std::string(""));
+  nh_private.param("rot_switch_param", rot_switch_param_, std::string(""));
 
   nh_private.param("capture_velo", capture_velo_, 0.1);
   nh_private.param("capture_interval", capture_interval_, 0.1);

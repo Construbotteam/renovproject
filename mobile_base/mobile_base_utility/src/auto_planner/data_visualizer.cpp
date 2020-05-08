@@ -46,6 +46,7 @@ void DataVisualizer::showWalls(const LineParamVec& lines) {
 
   marker.type = visualization_msgs::Marker::LINE_LIST;
   marker.action = visualization_msgs::Marker::ADD;
+  marker.pose.orientation.w = 1.0;
 
   marker.scale.x = 0.2;
   marker.color.a = 1.0;

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="switch" value="rot_switch" />
+  <node pkg="mobile_base_utility" type="wall_follow_ros_node" name="wall_follow_ros_node" output="screen" >
+    <param name="arr_param_name" value="cooperation/nav_flag" />
+    <param name="rot_switch_param" value="$(arg switch)" />
+    <param name="capture_interval" value="1.57" />
+    <param name="circum_radius" value="0.8" />
+    <param name="task_dis" value="0.3" />
+    <param name="task_interval" value="0.2" />
+  </node>
+
+  <node pkg="mobile_base_utility" type="pure_rotater" name="pure_rotater" output="screen" >
+    <param name="js_topic" value="cmd_base_joint"/>
+    <param name="diff_topic" value="cmd_vel"/>
+    <param name="rot_switch_param" value="$(arg switch)" />
+    <param name="use_diff" value="true"/>
+    <param name="capture_velo" value="0.4"/>
+  </node>
+</launch>
