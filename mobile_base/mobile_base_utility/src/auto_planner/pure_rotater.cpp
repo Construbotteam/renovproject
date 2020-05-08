@@ -19,7 +19,7 @@ void initParam(ros::NodeHandle& nh_private) {
   nh_private.param("rot_switch_param", rot_switch_param, std::string(""));
   nh_private.param("use_diff", use_diff, false);
   nh_private.param("capture_velo", capture_velo, 0.1);
-  capture_duration = 1.25 * M_PI / capture_velo;
+  capture_duration = 1.25 * 2 * M_PI / capture_velo;
 }
 
 void fourWheelMotion(const ros::Publisher& cmd_pub) {

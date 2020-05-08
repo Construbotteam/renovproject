@@ -4,6 +4,8 @@
 
 namespace mobile_base {
 
+void test(const int& a, const int& b) {}
+
 WallFollowROS::WallFollowROS(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
                              tf2_ros::Buffer& bf)
     : get_map_(false), wall_finish_(true), bf_(bf) {
@@ -13,15 +15,21 @@ WallFollowROS::WallFollowROS(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
   goal_pub_ = nh.advertise<geometry_msgs::PoseStamped>(goal_topic_, 10);
   visualizer_.getNodeHandle(nh);
 
-  int center_num = 1;
-  Pose2d centers[center_num];
-  centers[0].x_ = 0.0;
-  centers[0].y_ = 0.0;
-  centers[0].th_ = 0.0;
-  if (!room_extractor_.setRooms(center_num, centers)) {
+  // int center_num = 1;
+  // Pose2d centers[center_num];
+  center_num_ = 1;
+  centers_ = new Pose2d[center_num_];
+  centers_[0].x_ = 0.0;
+  centers_[0].y_ = 0.0;
+  centers_[0].th_ = 0.0;
+  if (!room_extractor_.setRooms(center_num_, centers_)) {
     ROS_WARN("Set rooms to extractor failure");
   }
 
+  plan_thread_ = new std::thread(&WallFollowROS::planLoop, this);
+}
+
+void WallFollowROS::planLoop() {
   // remember to increase by 1 after each circle
   int center_index = 0;
   while (ros::ok()) {
@@ -34,7 +42,7 @@ WallFollowROS::WallFollowROS(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
     if (wall_finish_) {
       // send centers of walls sequentially
       geometry_msgs::PoseStamped goal = getStampedPose2D(
-          centers[center_index].x_, centers[center_index].y_, 0.0);
+          centers_[center_index].x_, centers_[center_index].y_, 0.0);
       goal_pub_.publish(goal);
 
       // one goal point at a time and wait till arrival
@@ -113,7 +121,14 @@ WallFollowROS::WallFollowROS(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
   }
 }
 
-WallFollowROS::~WallFollowROS() {}
+WallFollowROS::~WallFollowROS() {
+  if (centers_) {
+    delete[] centers_;
+  }
+  if (plan_thread_) {
+    delete plan_thread_;
+  }
+}
 
 void WallFollowROS::initParam(ros::NodeHandle& nh_private) {
   nh_private.param("map_topic", map_topic_, std::string("map"));

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "angles/angles.h"
@@ -39,6 +40,7 @@ class WallFollowROS {
   Pose2dVec getWayPoints(const LineParamVec& sorted_lines, const Pose2d& pose);
   void transformPoints(const PoseStampedVec& in, PoseStampedVec& out,
                        const geometry_msgs::Transform& tfm);
+  void planLoop();
 
  private:
   std::string map_topic_, goal_topic_;
@@ -59,6 +61,10 @@ class WallFollowROS {
 
   RoomLineExtractor room_extractor_;
   DataVisualizer visualizer_;
+  Pose2d* centers_;
+  int center_num_;
+
+  std::thread* plan_thread_;
 };  // class WallFollowROS
 
 }  // namespace mobile_base
