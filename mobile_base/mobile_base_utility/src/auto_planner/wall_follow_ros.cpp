@@ -11,16 +11,23 @@ WallFollowROS::WallFollowROS(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
 
   map_sub_ = nh.subscribe(map_topic_, 10, &WallFollowROS::getMapCallback, this);
   goal_pub_ = nh.advertise<geometry_msgs::PoseStamped>(goal_topic_, 10);
+  visualizer_.getNodeHandle(nh);
 
   int center_num = 1;
   Pose2d centers[center_num];
+  centers[0].x_ = 0.0;
+  centers[0].y_ = 0.0;
+  centers[0].th_ = 0.0;
   if (!room_extractor_.setRooms(center_num, centers)) {
     ROS_WARN("Set rooms to extractor failure");
   }
 
+  // remember to increase by 1 after each circle
   int center_index = 0;
   while (ros::ok()) {
     if (!get_map_) {
+      ROS_WARN("Please a offer a map by topic first");
+      ros::Duration(1.0).sleep();
       continue;
     }
 
@@ -34,7 +41,7 @@ WallFollowROS::WallFollowROS(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
       ros::Duration(0.1).sleep();
       while (true) {
         bool if_arrive = false;
-        ros::param::get(arr_namespace_ + "/" + arr_param_name, if_arrive);
+        ros::param::get(arr_param_name_, if_arrive);
         if (if_arrive) {
           break;
         }
@@ -79,6 +86,8 @@ WallFollowROS::WallFollowROS(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
 
       // apply lsd method to extract line features in virtual picture
       VirtualPic virtual_pic = room_extractor_.getVirtualPic();
+      visualizer_.showVirtualPic(virtual_pic);
+
       int line_num;
       double* lines = lsd(&line_num, virtual_pic.data_, virtual_pic.size_x_,
                           virtual_pic.size_y_);
@@ -92,9 +101,11 @@ WallFollowROS::WallFollowROS(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
                     tf2::getYaw(global_pose.pose.orientation));
       LineParamVec sequential_walls =
           room_extractor_.computeWalls(line_num, lines, pose2d);
+      visualizer_.showWalls(sequential_walls);
 
       // get way points
       Pose2dVec way_ponits = getWayPoints(sequential_walls, pose2d);
+      visualizer_.showWayPoints(way_ponits);
 
     }  // end of extracting walls into way points
 
@@ -109,7 +120,7 @@ void WallFollowROS::initParam(ros::NodeHandle& nh_private) {
   nh_private.param("map_frame_id", map_frame_id_, std::string("map"));
   nh_private.param("base_frame_id", base_frame_id_, std::string("base_link"));
   nh_private.param("scan_frame_id", scan_frame_id_, std::string("laser_link"));
-  nh_private.param("arr_param_name", arr_param_name, std::string(""));
+  nh_private.param("arr_param_name", arr_param_name_, std::string(""));
   nh_private.param("arr_namespace", arr_namespace_, std::string(""));
 
   nh_private.param("capture_velo", capture_velo_, 0.1);

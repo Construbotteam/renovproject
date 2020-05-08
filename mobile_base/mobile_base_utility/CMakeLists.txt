@@ -28,6 +28,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_library(auto_follow
   src/auto_planner/wall_follow_ros.cpp
+  src/auto_planner/data_visualizer.cpp
   src/auto_planner/room_line_extractor.cpp
   src/auto_planner/lsd.cpp
 )

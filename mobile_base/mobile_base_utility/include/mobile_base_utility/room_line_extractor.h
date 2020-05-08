@@ -22,6 +22,7 @@ struct Pose2d {
 
   //   typedef std::shared_ptr<Pose2d> Ptr;
 };  // struct Pose2d
+typedef std::vector<Pose2d> Pose2dVec;
 
 // This structure contains fours parts of a 2d straight line
 /* The two endpoints of this line

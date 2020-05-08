@@ -8,6 +8,7 @@
 #include "angles/angles.h"
 #include "geometry_msgs/PoseArray.h"
 #include "geometry_msgs/PoseStamped.h"
+#include "mobile_base_utility/data_visualizer.h"
 #include "mobile_base_utility/room_line_extractor.h"
 #include "nav_msgs/OccupancyGrid.h"
 #include "ros/ros.h"
@@ -44,7 +45,7 @@ class WallFollowROS {
   std::string map_frame_id_, base_frame_id_, scan_frame_id_;
 
   // arr -> abbr. of arrival
-  std::string arr_param_name, arr_namespace_;
+  std::string arr_param_name_, arr_namespace_;
   std::string rot_switch_param_;
   bool get_map_, wall_finish_;
 
@@ -57,6 +58,7 @@ class WallFollowROS {
   tf2_ros::Buffer& bf_;
 
   RoomLineExtractor room_extractor_;
+  DataVisualizer visualizer_;
 };  // class WallFollowROS
 
 }  // namespace mobile_base
