@@ -49,10 +49,11 @@ class WallFollowROS {
   // arr -> abbr. of arrival
   std::string arr_param_name_, arr_namespace_;
   std::string rot_switch_param_;
-  bool get_map_, wall_finish_;
+  bool get_map_, wall_finish_, use_lsd_;
 
   double capture_velo_, capture_duration_, capture_interval_;
   double circum_radius_, task_dis_, task_interval_;
+  double max_laser_range_;
 
   ros::Subscriber map_sub_, scan_sub_;
   ros::Publisher goal_pub_;

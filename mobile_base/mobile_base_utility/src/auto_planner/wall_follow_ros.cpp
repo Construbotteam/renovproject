@@ -8,7 +8,7 @@ void test(const int& a, const int& b) {}
 
 WallFollowROS::WallFollowROS(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
                              tf2_ros::Buffer& bf)
-    : get_map_(false), wall_finish_(true), bf_(bf) {
+    : get_map_(false), wall_finish_(true), use_lsd_(false), bf_(bf) {
   initParam(nh_private);
 
   map_sub_ = nh.subscribe(map_topic_, 10, &WallFollowROS::getMapCallback, this);
@@ -58,6 +58,7 @@ void WallFollowROS::planLoop() {
         ros::Duration(0.5).sleep();
       }  // end of while-loop to get the arrival signal
       wall_finish_ = false;
+      ROS_INFO("I arrive the center position");
 
       // combine different frames of scans to get a virtual 2D pixel picture
       geometry_msgs::PoseStamped global_pose;
@@ -67,13 +68,17 @@ void WallFollowROS::planLoop() {
       }
       double pre_yaw = tf2::getYaw(global_pose.pose.orientation);
 
-      room_extractor_.resetVirtualPic();
-      room_extractor_.resetScanCloud();
-
+      // reset and update for the first time
       std::vector<double> scan_points;
       scanTransform(scan_points);
-      room_extractor_.updateVirtualPic(scan_points);
-      room_extractor_.updateScanCloud(scan_points);
+      if (use_lsd_) {
+        room_extractor_.resetVirtualPic();
+        room_extractor_.updateVirtualPic(scan_points);
+      } else {
+        room_extractor_.resetScanCloud();
+        room_extractor_.updateScanCloud(scan_points);
+      }
+      ROS_INFO("I update the first frame of point cloud");
 
       ros::param::set(rot_switch_param_, true);
       while (true) {
@@ -87,8 +92,11 @@ void WallFollowROS::planLoop() {
             fabs(angles::shortest_angular_distance(pre_yaw, cur_yaw));
         if (angle_diff > capture_interval_) {
           scanTransform(scan_points);
-          room_extractor_.updateVirtualPic(scan_points);
-          room_extractor_.updateScanCloud(scan_points);
+          if (use_lsd_) {
+            room_extractor_.updateVirtualPic(scan_points);
+          } else {
+            room_extractor_.updateScanCloud(scan_points);
+          }
           pre_yaw = cur_yaw;
         }
 
@@ -98,31 +106,35 @@ void WallFollowROS::planLoop() {
           break;
         }
       }
-
-      // apply lsd method to extract line features in virtual picture
-      VirtualPic virtual_pic = room_extractor_.getVirtualPic();
-      visualizer_.showVirtualPic(virtual_pic);
-
-      int line_num;
-      double* lines = lsd(&line_num, virtual_pic.data_, virtual_pic.size_x_,
-                          virtual_pic.size_y_);
+      ROS_INFO("I get all the frames of point cloud");
 
       if (!getGlobalPose(global_pose)) {
         ROS_WARN("Get global pose of robot failure!!!");
         continue;
       }
-
       Pose2d pose2d(global_pose.pose.position.x, global_pose.pose.position.y,
                     tf2::getYaw(global_pose.pose.orientation));
-      LineParamVec sequential_walls =
-          room_extractor_.computeWalls(line_num, lines, pose2d);
-      LineParamVec sequential_walls_test = room_extractor_.extract();
-      // visualizer_.showWalls(sequential_walls);
-      visualizer_.showWalls(sequential_walls_test);
+
+      LineParamVec sequential_walls;
+      if (use_lsd_) {
+        // apply lsd method to extract line features in virtual picture
+        VirtualPic virtual_pic = room_extractor_.getVirtualPic();
+        visualizer_.showVirtualPic(virtual_pic);
+
+        int line_num;
+        double* lines = lsd(&line_num, virtual_pic.data_, virtual_pic.size_x_,
+                            virtual_pic.size_y_);
+
+        sequential_walls =
+            room_extractor_.computeWalls(line_num, lines, pose2d);
+      } else {
+        sequential_walls = room_extractor_.extract();
+      }
+      visualizer_.showWalls(sequential_walls);
+      ROS_INFO("I finish computing the walls");
 
       // get way points
-      // Pose2dVec way_points = getWayPoints(sequential_walls, pose2d);
-      Pose2dVec way_points = getWayPoints(sequential_walls_test, pose2d);
+      Pose2dVec way_points = getWayPoints(sequential_walls, pose2d);
       visualizer_.showWayPoints(way_points);
 
     }  // end of extracting walls into way points
@@ -158,6 +170,9 @@ void WallFollowROS::initParam(ros::NodeHandle& nh_private) {
   nh_private.param("circum_radius", circum_radius_, 0.5);
   nh_private.param("task_dis", task_dis_, 0.5);
   nh_private.param("task_interval", task_interval_, 0.5);
+  nh_private.param("max_laser_range", max_laser_range_, 10.0);
+
+  nh_private.param("use_lsd", use_lsd_, false);
 
   int step_size, countThreshold;
   double disThreshold, min_wall_size;
@@ -243,6 +258,11 @@ bool WallFollowROS::scanTransform(std::vector<double>& scan_points) {
   double scan_angle = scan_data_.angle_min;
   int index = 0;
   while (scan_angle <= scan_data_.angle_max) {
+    if (fabs(scan_data_.ranges[index]) > max_laser_range_) {
+      index++;
+      continue;
+    }
+
     geometry_msgs::PoseStamped pose;
     tf2::toMsg(tf2::Transform::getIdentity(), pose.pose);
 
