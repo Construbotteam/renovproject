@@ -1,6 +1,7 @@
 #ifndef ROOM_LINE_EXTRACTOR
 #define ROOM_LINE_EXTRACTOR
 
+#include <algorithm>
 #include <eigen3/Eigen/Dense>
 #include <iostream>
 #include <limits>
@@ -39,6 +40,24 @@ struct LineParam {
     e_start_ = e_end_;
     e_end_ = tmp;
   }
+  void complete() {
+    double x1, y1, x2, y2;
+    x1 = start_.x_;
+    y1 = start_.y_;
+    x2 = end_.x_;
+    y2 = end_.y_;
+    e_start_.x_ = x1 + 1.0;
+    e_end_.x_ = x2 + 1.0;
+    if (fabs(end_.y_ - start_.y_) < 1e-5) {
+      e_start_.x_ = x1;
+      e_start_.y_ = y1 + 1.0;
+      e_end_.x_ = x2;
+      e_end_.y_ = y2 + 1.0;
+    } else {
+      e_start_.y_ = (x1 - x2) / (y2 - y1) + y1;
+      e_end_.y_ = (x1 - x2) / (y2 - y1) + y2;
+    }
+  }
   Pose2d start_, end_;
   Pose2d e_start_, e_end_;
 };  // struct LineParam
@@ -64,14 +83,28 @@ class RoomLineExtractor {
   LineParamVec sortLines(const Pose2d& pose, const LineParamVec& param_vec);
   double point2LineDistance(const double& x, const double& y,
                             const LineParam& param);
+  void updateScanCloud(const std::vector<double>& ps);
+  void resetScanCloud();
+  LineParamVec extract();
+  LineParam lineFit(const Pose2dVec& points);
 
+  static inline bool cloudCompare(const Pose2d& p1, const Pose2d& p2) {
+    return p1.th_ < p2.th_;
+  }
+
+  void setExtractorParam(const int& step_size, const double& disThreshold,
+                         const int& countThreshold,
+                         const double& min_wall_size);
   VirtualPic getVirtualPic() const { return virtual_pic_; }
   int getRoomQuantity() const { return room_num_; }
+  Pose2dVec getScanCloud() const { return scan_cloud_; }
 
  private:
-  int room_num_;
+  int room_num_, step_size_, countThreshold_;
   bool set_rooms_;
   bool init_pic_;
+  double disThreshold_, min_wall_size_;
+  Pose2dVec scan_cloud_;
 
   VirtualPic virtual_pic_;
   Pose2d* centers_;

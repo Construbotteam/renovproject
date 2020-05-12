@@ -2,7 +2,9 @@
 
 namespace mobile_base {
 
-RoomLineExtractor::RoomLineExtractor() : set_rooms_(false), init_pic_(false) {}
+RoomLineExtractor::RoomLineExtractor() : set_rooms_(false), init_pic_(false) {
+  scan_cloud_.clear();
+}
 
 RoomLineExtractor::~RoomLineExtractor() {
   if (centers_) {
@@ -85,23 +87,12 @@ LineParamVec RoomLineExtractor::computeWalls(const int& num, double* tuple,
   line_params.clear();
   for (size_t i = 0; i < num; i++) {
     LineParam param;
-    double x1, y1, x2, y2;
-    x1 = param.start_.x_ = tuple[i * 7 + 0];
-    y1 = param.start_.y_ = tuple[i * 7 + 1];
-    x2 = param.end_.x_ = tuple[i * 7 + 2];
-    y2 = param.end_.y_ = tuple[i * 7 + 3];
+    param.start_.x_ = tuple[i * 7 + 0];
+    param.start_.y_ = tuple[i * 7 + 1];
+    param.end_.x_ = tuple[i * 7 + 2];
+    param.end_.y_ = tuple[i * 7 + 3];
 
-    param.e_start_.x_ = x1 + 1.0;
-    param.e_end_.x_ = x2 + 1.0;
-    if (fabs(param.end_.y_ - param.start_.y_) < 1e-5) {
-      param.e_start_.x_ = x1;
-      param.e_start_.y_ = y1 + 1.0;
-      param.e_end_.x_ = x2;
-      param.e_end_.y_ = y2 + 1.0;
-    } else {
-      param.e_start_.y_ = (x1 - x2) / (y2 - y1) + y1;
-      param.e_end_.y_ = (x1 - x2) / (y2 - y1) + y2;
-    }
+    param.complete();
     line_params.push_back(param);
   }
 
@@ -189,6 +180,122 @@ double RoomLineExtractor::point2LineDistance(const double& x, const double& y,
   double dis = sqrt(pow(v1.norm(), 2) - pow(right_angle_edge, 2));
 
   return dis;
+}
+
+void RoomLineExtractor::setExtractorParam(const int& step_size,
+                                          const double& disThreshold,
+                                          const int& countThreshold,
+                                          const double& min_wall_size) {
+  if (step_size > 0) {
+    step_size_ = step_size;
+  } else {
+    std::cerr << "Step size should be greater than 1" << std::endl;
+    step_size_ = 1;
+  }
+
+  disThreshold_ = disThreshold;
+  countThreshold_ = std::min(countThreshold, step_size_);
+  min_wall_size_ = min_wall_size;
+}
+
+void RoomLineExtractor::updateScanCloud(const std::vector<double>& ps) {
+  for (size_t i = 0; i < ps.size() / 2; i++) {
+    Pose2d pose;
+    pose.x_ = ps[2 * i + 0];
+    pose.y_ = ps[2 * i + 1];
+    scan_cloud_.push_back(pose);
+  }
+}
+
+void RoomLineExtractor::resetScanCloud() { scan_cloud_.clear(); }
+
+LineParam RoomLineExtractor::lineFit(const Pose2dVec& points) {
+  int points_size = points.size();
+  Eigen::VectorXd b_vec(points_size);
+  Eigen::MatrixXd mat = Eigen::MatrixXd::Ones(points_size, 2);
+  for (size_t i = 0; i < points_size; i++) {
+    b_vec(i) = points[i].y_;
+    mat(i, 0) = points[i].x_;
+  }
+
+  int k, b;
+  Eigen::Vector2d analytic =
+      (mat.transpose() * mat).inverse() * mat.transpose() * b_vec;
+  k = analytic(0);
+  b = analytic(1);
+
+  LineParam fit_param;
+  fit_param.start_.x_ = points[0].x_;
+  fit_param.start_.y_ = k * points[0].x_ + b;
+  fit_param.end_.x_ = points.back().x_;
+  fit_param.end_.y_ = k * points.back().x_ + b;
+
+  return fit_param;
+}
+
+LineParamVec RoomLineExtractor::extract() {
+  LineParamVec walls;
+  walls.clear();
+  // sort the cloud
+  for (size_t i = 0; i < scan_cloud_.size(); i++) {
+    scan_cloud_[i].th_ = atan2(scan_cloud_[i].y_, scan_cloud_[i].x_);
+  }
+  std::sort(scan_cloud_.begin(), scan_cloud_.end(),
+            RoomLineExtractor::cloudCompare);
+  // compute lines
+  Pose2dVec fit_points;
+  fit_points.push_back(scan_cloud_[0]);
+  fit_points.push_back(scan_cloud_[1]);
+  int index = 1;
+  while (index < scan_cloud_.size()) {
+    LineParam fit_param = lineFit(fit_points);
+
+    // count numbers of points that exceed the distance threshold
+    int ex_count = 0;
+    int rest_points_count = scan_cloud_.size() - 1 - index;
+    for (size_t i = 0; i < std::min(step_size_, rest_points_count); i++) {
+      double dis_tmp =
+          point2LineDistance(scan_cloud_[index + i + 1].x_,
+                             scan_cloud_[index + i + 1].y_, fit_param);
+      if (dis_tmp > disThreshold_) {
+        ex_count++;
+      } else {
+        fit_points.push_back(scan_cloud_[index + i + 1]);
+      }
+    }
+
+    if (step_size_ >= rest_points_count) {
+      fit_param = lineFit(fit_points);
+      double wall_size = hypot(fit_param.start_.x_ - fit_param.end_.x_,
+                               fit_param.start_.y_ - fit_param.end_.y_);
+      if (wall_size >= min_wall_size_) {
+        fit_param.complete();
+        walls.push_back(fit_param);
+      }
+      break;
+    } else if (ex_count > countThreshold_) {
+      fit_param = lineFit(fit_points);
+      double wall_size = hypot(fit_param.start_.x_ - fit_param.end_.x_,
+                               fit_param.start_.y_ - fit_param.end_.y_);
+      if (wall_size >= min_wall_size_) {
+        fit_param.complete();
+        walls.push_back(fit_param);
+      }
+
+      index = index + 1 + (step_size_ - ex_count);
+      fit_points.clear();
+      fit_points.push_back(scan_cloud_[index]);
+      fit_points.push_back(scan_cloud_[index + 1]);
+
+      index++;
+    } else {
+      index += step_size_;
+    }
+  }
+  // connect the first and last lines if neccessary
+  /* TO DO */
+  // return lines
+  return walls;
 }
 
 }  // namespace mobile_base

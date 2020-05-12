@@ -12,7 +12,8 @@ WallFollowROS::WallFollowROS(ros::NodeHandle& nh, ros::NodeHandle& nh_private,
   initParam(nh_private);
 
   map_sub_ = nh.subscribe(map_topic_, 10, &WallFollowROS::getMapCallback, this);
-  scan_sub_ = nh.subscribe(scan_topic_, 10, &WallFollowROS::getScanCallback, this);
+  scan_sub_ =
+      nh.subscribe(scan_topic_, 10, &WallFollowROS::getScanCallback, this);
   goal_pub_ = nh.advertise<geometry_msgs::PoseStamped>(goal_topic_, 10);
   visualizer_.getNodeHandle(nh);
 
@@ -66,9 +67,13 @@ void WallFollowROS::planLoop() {
       }
       double pre_yaw = tf2::getYaw(global_pose.pose.orientation);
 
+      room_extractor_.resetVirtualPic();
+      room_extractor_.resetScanCloud();
+
       std::vector<double> scan_points;
       scanTransform(scan_points);
       room_extractor_.updateVirtualPic(scan_points);
+      room_extractor_.updateScanCloud(scan_points);
 
       ros::param::set(rot_switch_param_, true);
       while (true) {
@@ -83,6 +88,7 @@ void WallFollowROS::planLoop() {
         if (angle_diff > capture_interval_) {
           scanTransform(scan_points);
           room_extractor_.updateVirtualPic(scan_points);
+          room_extractor_.updateScanCloud(scan_points);
           pre_yaw = cur_yaw;
         }
 
@@ -110,10 +116,13 @@ void WallFollowROS::planLoop() {
                     tf2::getYaw(global_pose.pose.orientation));
       LineParamVec sequential_walls =
           room_extractor_.computeWalls(line_num, lines, pose2d);
-      visualizer_.showWalls(sequential_walls);
+      LineParamVec sequential_walls_test = room_extractor_.extract();
+      // visualizer_.showWalls(sequential_walls);
+      visualizer_.showWalls(sequential_walls_test);
 
       // get way points
-      Pose2dVec way_points = getWayPoints(sequential_walls, pose2d);
+      // Pose2dVec way_points = getWayPoints(sequential_walls, pose2d);
+      Pose2dVec way_points = getWayPoints(sequential_walls_test, pose2d);
       visualizer_.showWayPoints(way_points);
 
     }  // end of extracting walls into way points
@@ -149,6 +158,15 @@ void WallFollowROS::initParam(ros::NodeHandle& nh_private) {
   nh_private.param("circum_radius", circum_radius_, 0.5);
   nh_private.param("task_dis", task_dis_, 0.5);
   nh_private.param("task_interval", task_interval_, 0.5);
+
+  int step_size, countThreshold;
+  double disThreshold, min_wall_size;
+  nh_private.param("step_size", step_size, 5);
+  nh_private.param("countThreshold", countThreshold, 2);
+  nh_private.param("disThreshold", disThreshold, 0.05);
+  nh_private.param("min_wall_size", min_wall_size, 0.6);
+  room_extractor_.setExtractorParam(step_size, disThreshold, countThreshold,
+                                    min_wall_size);
 }
 
 void WallFollowROS::getMapCallback(const nav_msgs::OccupancyGrid& map_msg) {
