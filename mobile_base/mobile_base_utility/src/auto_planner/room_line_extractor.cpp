@@ -234,6 +234,9 @@ void RoomLineExtractor::filterScanCloud() {
     }
     id++;
   }
+
+  scan_cloud_.clear();
+  scan_cloud_ = Pose2dVec(filter_cloud.begin(), filter_cloud.end());
 }
 
 LineParam RoomLineExtractor::lineFit(const Pose2dVec& points) {

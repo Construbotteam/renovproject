@@ -10,6 +10,14 @@
     <param name="task_interval" value="0.2" />
     <param name="max_laser_range" value="10.0" />
     <param name="use_lsd" value="false" />
+
+    <param name="step_size" value="2" />
+    <param name="countThreshold" value="1" />
+    <param name="disThreshold" value="0.05" />
+    <param name="min_wall_size" value="0.3" />
+    <param name="min_fit_points_num" value="3" />
+    <param name="min_angle_dis" value="0.0175" />
+    <param name="min_neighbour_dis" value="0.05" />
   </node>
 
   <node pkg="mobile_base_utility" type="pure_rotater" name="pure_rotater" output="screen" >

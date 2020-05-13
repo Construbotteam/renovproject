@@ -132,7 +132,7 @@ void WallFollowROS::planLoop() {
         sequential_walls = room_extractor_.extract();
       }
       visualizer_.showWalls(sequential_walls);
-      ROS_INFO("I finish computing the walls");
+      ROS_INFO("I finish computing %d walls", sequential_walls.size());
 
       // get way points
       Pose2dVec way_points = getWayPoints(sequential_walls, pose2d);
