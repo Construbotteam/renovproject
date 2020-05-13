@@ -85,16 +85,35 @@ class RoomLineExtractor {
                             const LineParam& param);
   void updateScanCloud(const std::vector<double>& ps);
   void resetScanCloud();
+  void filterScanCloud();
   LineParamVec extract();
   LineParam lineFit(const Pose2dVec& points);
+  inline bool isWallValid(const LineParam& param, const Pose2dVec& poses) {
+    double wall_size =
+        hypot(param.start_.x_ - param.end_.x_, param.start_.y_ - param.end_.y_);
+
+    return (wall_size > min_wall_size_ && poses.size() > min_fit_points_num_);
+  }
 
   static inline bool cloudCompare(const Pose2d& p1, const Pose2d& p2) {
     return p1.th_ < p2.th_;
   }
+  inline int sign(const double& num) { return num >= 0 ? 1 : -1; }
+  inline double shortestAngleDistance(const double& from, const double& to) {
+    double angle_dis = to - from;
+
+    if (fabs(angle_dis) > M_PI) {
+      angle_dis = -sign(angle_dis) * (2 * M_PI - fabs(angle_dis));
+    }
+
+    return angle_dis;
+  }
 
   void setExtractorParam(const int& step_size, const double& disThreshold,
-                         const int& countThreshold,
-                         const double& min_wall_size);
+                         const int& countThreshold, const double& min_wall_size,
+                         const int& min_fit_points_num,
+                         const double& min_angle_dis,
+                         const double& min_neighbour_dis);
   VirtualPic getVirtualPic() const { return virtual_pic_; }
   int getRoomQuantity() const { return room_num_; }
   Pose2dVec getScanCloud() const { return scan_cloud_; }
@@ -104,6 +123,8 @@ class RoomLineExtractor {
   bool set_rooms_;
   bool init_pic_;
   double disThreshold_, min_wall_size_;
+  double min_angle_dis_, min_neighbour_dis_;
+  int min_fit_points_num_;
   Pose2dVec scan_cloud_;
 
   VirtualPic virtual_pic_;

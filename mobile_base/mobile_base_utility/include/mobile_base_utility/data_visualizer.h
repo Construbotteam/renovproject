@@ -20,9 +20,11 @@ class DataVisualizer {
   void showWalls(const LineParamVec& lines);
   void showVirtualPic(const VirtualPic& pic);
   void showWayPoints(const Pose2dVec& poses);
+  void showScanCloud(const Pose2dVec& points);
 
  private:
   ros::Publisher wall_pub_, pic_pub_, way_points_pub_;
+  ros::Publisher scan_cloud_pub_;
 };  // class DataVisualizer
 
 }  // namespace mobile_base

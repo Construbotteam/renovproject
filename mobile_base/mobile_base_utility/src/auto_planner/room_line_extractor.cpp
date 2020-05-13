@@ -172,20 +172,20 @@ LineParamVec RoomLineExtractor::sortLines(const Pose2d& pose,
 
 double RoomLineExtractor::point2LineDistance(const double& x, const double& y,
                                              const LineParam& param) {
-  Eigen::Vector2d v1(x - param.start_.x_, y - param.start_.y_);
-  Eigen::Vector2d v2(param.end_.x_ - param.start_.x_,
-                     param.end_.y_ - param.start_.y_);
+  Eigen::Vector3d v1(x - param.start_.x_, y - param.start_.y_, 0);
+  Eigen::Vector3d v2(param.end_.x_ - param.start_.x_,
+                     param.end_.y_ - param.start_.y_, 0);
 
-  double right_angle_edge = v1.dot(v2) / v2.norm();
-  double dis = sqrt(pow(v1.norm(), 2) - pow(right_angle_edge, 2));
+  // area of parallelogram equals to base times height
+  double dis = (v1.cross(v2)).norm() / v2.norm();
 
   return dis;
 }
 
-void RoomLineExtractor::setExtractorParam(const int& step_size,
-                                          const double& disThreshold,
-                                          const int& countThreshold,
-                                          const double& min_wall_size) {
+void RoomLineExtractor::setExtractorParam(
+    const int& step_size, const double& disThreshold, const int& countThreshold,
+    const double& min_wall_size, const int& min_fit_points_num,
+    const double& min_angle_dis, const double& min_neighbour_dis) {
   if (step_size > 0) {
     step_size_ = step_size;
   } else {
@@ -196,6 +196,10 @@ void RoomLineExtractor::setExtractorParam(const int& step_size,
   disThreshold_ = disThreshold;
   countThreshold_ = std::min(countThreshold, step_size_);
   min_wall_size_ = min_wall_size;
+  min_fit_points_num_ = min_fit_points_num;
+
+  min_angle_dis_ = min_angle_dis;
+  min_neighbour_dis_ = min_neighbour_dis;
 }
 
 void RoomLineExtractor::updateScanCloud(const std::vector<double>& ps) {
@@ -208,6 +212,29 @@ void RoomLineExtractor::updateScanCloud(const std::vector<double>& ps) {
 }
 
 void RoomLineExtractor::resetScanCloud() { scan_cloud_.clear(); }
+
+void RoomLineExtractor::filterScanCloud() {
+  Pose2dVec filter_cloud;
+  filter_cloud.clear();
+
+  int id = 1;
+  Pose2d cur_point = scan_cloud_[0];
+  while (id < scan_cloud_.size()) {
+    double neighbour_dis = hypot(cur_point.x_ - scan_cloud_[id].x_,
+                                 cur_point.y_ - scan_cloud_[id].y_);
+
+    double cur_ang = atan2(cur_point.y_, cur_point.x_);
+    double next_ang = atan2(scan_cloud_[id].y_, scan_cloud_[id].x_);
+    double neighbour_angle_dis = shortestAngleDistance(cur_ang, next_ang);
+
+    if (neighbour_angle_dis > min_angle_dis_ &&
+        neighbour_dis > min_neighbour_dis_) {
+      filter_cloud.push_back(scan_cloud_[id]);
+      cur_point = scan_cloud_[id];
+    }
+    id++;
+  }
+}
 
 LineParam RoomLineExtractor::lineFit(const Pose2dVec& points) {
   int points_size = points.size();
@@ -242,6 +269,8 @@ LineParamVec RoomLineExtractor::extract() {
   }
   std::sort(scan_cloud_.begin(), scan_cloud_.end(),
             RoomLineExtractor::cloudCompare);
+
+  filterScanCloud();
   // compute lines
   Pose2dVec fit_points;
   fit_points.push_back(scan_cloud_[0]);
@@ -266,18 +295,14 @@ LineParamVec RoomLineExtractor::extract() {
 
     if (step_size_ >= rest_points_count) {
       fit_param = lineFit(fit_points);
-      double wall_size = hypot(fit_param.start_.x_ - fit_param.end_.x_,
-                               fit_param.start_.y_ - fit_param.end_.y_);
-      if (wall_size >= min_wall_size_) {
+      if (isWallValid(fit_param, fit_points)) {
         fit_param.complete();
         walls.push_back(fit_param);
       }
       break;
     } else if (ex_count > countThreshold_) {
       fit_param = lineFit(fit_points);
-      double wall_size = hypot(fit_param.start_.x_ - fit_param.end_.x_,
-                               fit_param.start_.y_ - fit_param.end_.y_);
-      if (wall_size >= min_wall_size_) {
+      if (isWallValid(fit_param, fit_points)) {
         fit_param.complete();
         walls.push_back(fit_param);
       }

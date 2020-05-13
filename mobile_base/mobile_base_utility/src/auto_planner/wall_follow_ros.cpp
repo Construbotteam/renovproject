@@ -107,6 +107,7 @@ void WallFollowROS::planLoop() {
         }
       }
       ROS_INFO("I get all the frames of point cloud");
+      visualizer_.showScanCloud(room_extractor_.getScanCloud());
 
       if (!getGlobalPose(global_pose)) {
         ROS_WARN("Get global pose of robot failure!!!");
@@ -174,14 +175,19 @@ void WallFollowROS::initParam(ros::NodeHandle& nh_private) {
 
   nh_private.param("use_lsd", use_lsd_, false);
 
-  int step_size, countThreshold;
+  int step_size, countThreshold, min_fit_points_num;
   double disThreshold, min_wall_size;
+  double min_angle_dis, min_neighbour_dis;
   nh_private.param("step_size", step_size, 5);
   nh_private.param("countThreshold", countThreshold, 2);
   nh_private.param("disThreshold", disThreshold, 0.05);
   nh_private.param("min_wall_size", min_wall_size, 0.6);
+  nh_private.param("min_fit_points_num", min_fit_points_num, 3);
+  nh_private.param("min_angle_dis", min_angle_dis, 0.1);
+  nh_private.param("min_neighbour_dis", min_neighbour_dis, 0.05);
   room_extractor_.setExtractorParam(step_size, disThreshold, countThreshold,
-                                    min_wall_size);
+                                    min_wall_size, min_fit_points_num,
+                                    min_angle_dis, min_neighbour_dis);
 }
 
 void WallFollowROS::getMapCallback(const nav_msgs::OccupancyGrid& map_msg) {
@@ -258,7 +264,8 @@ bool WallFollowROS::scanTransform(std::vector<double>& scan_points) {
   double scan_angle = scan_data_.angle_min;
   int index = 0;
   while (scan_angle <= scan_data_.angle_max) {
-    if (fabs(scan_data_.ranges[index]) > max_laser_range_) {
+    double range = scan_data_.ranges[index];
+    if (fabs(range) > max_laser_range_ || std::isnan(range)) {
       index++;
       continue;
     }
