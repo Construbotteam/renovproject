@@ -57,3 +57,6 @@ target_link_libraries(wall_follow_ros_node auto_follow ${catkin_LIBRARIES})
 
 add_executable(pure_rotater src/auto_planner/pure_rotater.cpp)
 target_link_libraries(pure_rotater ${catkin_LIBRARIES})
+
+add_executable(extract_test src/auto_planner/extract_test.cpp)
+target_link_libraries(extract_test auto_follow ${catkin_LIBRARIES})
