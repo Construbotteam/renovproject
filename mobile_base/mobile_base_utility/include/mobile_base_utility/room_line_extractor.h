@@ -92,7 +92,16 @@ class RoomLineExtractor {
     double wall_size =
         hypot(param.start_.x_ - param.end_.x_, param.start_.y_ - param.end_.y_);
 
-    return (wall_size > min_wall_size_ && poses.size() > min_fit_points_num_);
+    bool valid =
+        (wall_size > min_wall_size_ && poses.size() > min_fit_points_num_);
+    if (!valid) {
+      printf(
+          "This wall is invalid since wall-size : %.3f (min : %.3f) and "
+          "points-num : %d (min : %d",
+          wall_size, min_wall_size_, poses.size(), min_fit_points_num_);
+    }
+
+    return valid;
   }
 
   static inline bool cloudCompare(const Pose2d& p1, const Pose2d& p2) {

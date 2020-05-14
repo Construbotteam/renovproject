@@ -107,7 +107,6 @@ void WallFollowROS::planLoop() {
         }
       }
       ROS_INFO("I get all the frames of point cloud");
-      visualizer_.showScanCloud(room_extractor_.getScanCloud());
 
       if (!getGlobalPose(global_pose)) {
         ROS_WARN("Get global pose of robot failure!!!");
@@ -130,6 +129,7 @@ void WallFollowROS::planLoop() {
             room_extractor_.computeWalls(line_num, lines, pose2d);
       } else {
         sequential_walls = room_extractor_.extract();
+        visualizer_.showScanCloud(room_extractor_.getScanCloud());
       }
       visualizer_.showWalls(sequential_walls);
       ROS_INFO("I finish computing %d walls", sequential_walls.size());
