@@ -248,7 +248,7 @@ LineParam RoomLineExtractor::lineFit(const Pose2dVec& points) {
     mat(i, 0) = points[i].x_;
   }
 
-  int k, b;
+  double k, b;
   Eigen::Vector2d analytic =
       (mat.transpose() * mat).inverse() * mat.transpose() * b_vec;
   k = analytic(0);

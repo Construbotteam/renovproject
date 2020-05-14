@@ -35,7 +35,7 @@ void WallFollowROS::planLoop() {
   // remember to increase by 1 after each circle
   int center_index = 0;
   while (ros::ok()) {
-    if (!get_map_) {
+    if (use_lsd_ && !get_map_) {
       ROS_WARN("Please a offer a map by topic first");
       ros::Duration(1.0).sleep();
       continue;
@@ -315,26 +315,25 @@ Pose2dVec WallFollowROS::getWayPoints(const LineParamVec& sorted_lines,
     Eigen::Vector2d end_vec(sorted_lines[i].end_.x_, sorted_lines[i].end_.y_);
     Eigen::Vector2d direc_vec = end_vec - start_vec;
     double wall_length = direc_vec.norm();
+    direc_vec.normalize();
 
-    double coef =
-        (pose_vec - start_vec).dot(direc_vec) / pow(direc_vec.norm(), 2);
+    double coef = (pose_vec - start_vec).dot(direc_vec) / direc_vec.norm();
 
     Eigen::Vector2d ortho_point_vec = start_vec + coef * direc_vec;
     Eigen::Vector2d ortho_vec = pose_vec - ortho_point_vec;
 
-    direc_vec.normalize();
     ortho_vec.normalize();
-    ortho_vec = ortho_vec * task_dis_;
+    ortho_vec = -1 * ortho_vec * task_dis_;
 
-    Eigen::Vector2d new_start = start_vec + ortho_vec;
-    Eigen::Vector2d new_end = end_vec + ortho_vec;
+    Eigen::Vector2d new_start = start_vec - ortho_vec;
+    Eigen::Vector2d new_end = end_vec - ortho_vec;
 
     bool get_first_task_pose = false;
-    double yaw = atan2(ortho_vec(0), ortho_vec(1));
+    double yaw = atan2(ortho_vec(1), ortho_vec(0));
     Eigen::Vector2d task_pose;
     while (true) {
       if (!get_first_task_pose) {
-        task_pose = new_start + task_interval_ * direc_vec;
+        task_pose = new_start + circum_radius_ * direc_vec;
         way_points.push_back(Pose2d(task_pose(0), task_pose(1), yaw));
 
         get_first_task_pose = true;
@@ -342,7 +341,8 @@ Pose2dVec WallFollowROS::getWayPoints(const LineParamVec& sorted_lines,
       }
       task_pose += task_interval_ * direc_vec;
 
-      if ((task_pose - new_start).norm() > wall_length) {
+      if ((task_pose - new_end).norm() < circum_radius_ ||
+          (task_pose - new_start).norm() > wall_length) {
         task_pose = new_end - circum_radius_ * direc_vec;
         way_points.push_back(Pose2d(task_pose(0), task_pose(1), yaw));
         break;
