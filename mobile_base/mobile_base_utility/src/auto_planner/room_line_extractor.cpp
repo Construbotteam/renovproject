@@ -129,8 +129,6 @@ LineParamVec RoomLineExtractor::sortLines(const Pose2d& pose,
     sorted_vec[0].reverse();
   }
 
-  std::vector<double> dve;
-
   int cur_index = closest_line_index;
   while (sorted_vec.size() < param_vec.size()) {
     double point_dis_min = std::numeric_limits<double>::max();

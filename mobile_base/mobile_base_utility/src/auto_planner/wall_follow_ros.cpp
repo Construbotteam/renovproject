@@ -45,7 +45,11 @@ void WallFollowROS::planLoop() {
       // send centers of walls sequentially
       geometry_msgs::PoseStamped goal = getStampedPose2D(
           centers_[center_index].x_, centers_[center_index].y_, 0.0);
+      // I dont know why a delay should be put before publish.
+      // The fact is it takes effect otherwise the publish does nothing
+      ros::Duration(0.2).sleep();
       goal_pub_.publish(goal);
+      ros::param::set("is_task_point", false);
 
       // one goal point at a time and wait till arrival
       ros::Duration(0.1).sleep();
@@ -132,12 +136,34 @@ void WallFollowROS::planLoop() {
         visualizer_.showScanCloud(room_extractor_.getScanCloud());
       }
       visualizer_.showWalls(sequential_walls);
-      ROS_INFO("I finish computing %d walls", sequential_walls.size());
+      ROS_INFO("I finish computing %d walls", (int)sequential_walls.size());
 
       // get way points
       Pose2dVec way_points = getWayPoints(sequential_walls, pose2d);
       visualizer_.showWayPoints(way_points);
 
+      int point_seq = 0;
+      Pose2dVec way_points_visual(way_points.rbegin(), way_points.rend());
+
+      bool manipulator_flag = true;
+      while (point_seq < way_points.size()) {
+        if (manipulator_flag) {
+          goal_pub_.publish(getStampedPose2D(way_points[point_seq].x_,
+                                             way_points[point_seq].y_,
+                                             way_points[point_seq].th_));
+          ROS_INFO("I publish the way point [x: %.2f, y: %.2f, th: %.2f] \n",
+                   way_points[point_seq].x_, way_points[point_seq].y_,
+                   way_points[point_seq].th_);
+
+          ros::param::set("manipulator_flag", false);
+          ros::param::set("is_task_point", true);
+          point_seq++;
+
+          way_points_visual.pop_back();
+          visualizer_.showWayPoints(way_points_visual);
+        }
+        ros::param::get("manipulator_flag", manipulator_flag);
+      }
     }  // end of extracting walls into way points
 
     ros::spinOnce();

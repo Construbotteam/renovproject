@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="switch" value="rot_switch" />
+  <arg name="static_arr_param_name" value="cooperation/nav_flag" />
   <node pkg="mobile_base_utility" type="wall_follow_ros_node" name="wall_follow_ros_node" output="screen" >
-    <param name="arr_param_name" value="cooperation/nav_flag" />
+    <param name="arr_param_name" value="$(arg static_arr_param_name)" />
     <param name="rot_switch_param" value="$(arg switch)" />
     <param name="capture_interval" value="1.57" />
     <param name="circum_radius" value="0.8" />
@@ -26,5 +27,9 @@
     <param name="rot_switch_param" value="$(arg switch)" />
     <param name="use_diff" value="true"/>
     <param name="capture_velo" value="0.4"/>
+  </node>
+
+  <node pkg="mobile_base_utility" type="virtual_state_publisher" name="virtual_state_publisher" output="screen" >
+    <param name="arr_param_name" value="$(arg static_arr_param_name)" />
   </node>
 </launch>

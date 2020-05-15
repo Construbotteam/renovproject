@@ -98,7 +98,7 @@ class RoomLineExtractor {
       printf(
           "This wall is invalid since wall-size : %.3f (min : %.3f) and "
           "points-num : %d (min : %d) \n",
-          wall_size, min_wall_size_, poses.size(), min_fit_points_num_);
+          wall_size, min_wall_size_, (int)poses.size(), min_fit_points_num_);
     }
 
     return valid;
