@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="switch" value="rot_switch" />
+  <arg name="static_arr_param_name" value="cooperation/nav_flag" />
+  <node pkg="mobile_base_utility" type="wall_follow_ros_node" name="wall_follow_ros_node" output="screen" >
+    <param name="arr_param_name" value="$(arg static_arr_param_name)" />
+    <param name="rot_switch_param" value="$(arg switch)" />
+    <param name="capture_interval" value="1.57" />
+    <param name="circum_radius" value="0.8" />
+    <param name="task_dis" value="0.3" />
+    <param name="task_interval" value="0.2" />
+    <param name="max_laser_range" value="10.0" />
+    <param name="use_lsd" value="false" />
+
+    <param name="step_size" value="2" />
+    <param name="countThreshold" value="1" />
+    <param name="disThreshold" value="0.05" />
+    <param name="min_wall_size" value="0.3" />
+    <param name="min_fit_points_num" value="3" />
+    <param name="min_angle_dis" value="0.0175" />
+    <param name="min_neighbour_dis" value="0.05" />
+  </node>
+
+  <node pkg="mobile_base_utility" type="pure_rotater" name="pure_rotater" output="screen" >
+    <param name="js_topic" value="cmd_base_joint"/>
+    <param name="diff_topic" value="cmd_vel"/>
+    <param name="rot_switch_param" value="$(arg switch)" />
+    <param name="use_diff" value="true"/>
+    <param name="capture_velo" value="0.4"/>
+  </node>
+
+  <node pkg="mobile_base_utility" type="virtual_state_publisher" name="virtual_state_publisher" output="screen" >
+    <param name="arr_param_name" value="$(arg static_arr_param_name)" />
+  </node>
+</launch>

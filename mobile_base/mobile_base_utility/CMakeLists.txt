@@ -26,6 +26,14 @@ catkin_package(
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
+add_library(auto_follow
+  src/auto_planner/wall_follow_ros.cpp
+  src/auto_planner/data_visualizer.cpp
+  src/auto_planner/room_line_extractor.cpp
+  src/auto_planner/lsd.cpp
+)
+target_link_libraries(auto_follow ${catkin_LIBRARIES})
+
 add_executable(way_point_note src/resolution_test/way_point_note.cpp)
 target_link_libraries(way_point_note ${catkin_LIBRARIES})
 
@@ -43,3 +51,15 @@ target_link_libraries(bim_map2scan yaml-cpp ${catkin_LIBRARIES})
 
 add_executable(send_road_point src/road_point/send_road_point.cpp)
 target_link_libraries(send_road_point yaml-cpp ${catkin_LIBRARIES})
+
+add_executable(wall_follow_ros_node src/auto_planner/wall_follow_ros_node.cpp)
+target_link_libraries(wall_follow_ros_node auto_follow ${catkin_LIBRARIES})
+
+add_executable(pure_rotater src/auto_planner/pure_rotater.cpp)
+target_link_libraries(pure_rotater ${catkin_LIBRARIES})
+
+add_executable(virtual_state_publisher src/auto_planner/virtual_mani_state_publisher.cpp)
+target_link_libraries(virtual_state_publisher ${catkin_LIBRARIES})
+
+add_executable(extract_test src/auto_planner/extract_test.cpp)
+target_link_libraries(extract_test auto_follow ${catkin_LIBRARIES})

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="mobile_base_utility" type="extract_test" name="extract_test" output="screen">
+    <param name="step_size" value="5" />
+    <param name="countThreshold" value="3" />
+    <param name="disThreshold" value="0.05" />
+    <param name="min_wall_size" value="0.3" />
+    <param name="min_fit_points_num" value="5" />
+    <!-- <param name="min_angle_dis" value="0.0" /> -->
+    <param name="min_angle_dis" value="0.0175" />
+    <param name="min_neighbour_dis" value="0.05" />
+    <param name="file_address" value="$(find mobile_base_utility)/data/scan.txt" />
+  </node>
+
+</launch>
+
+
+
