@@ -244,7 +244,11 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
 
     int stop_flag = 1;
     if (!send_stop_flag_) {
-      ros::param::set("search_port/mobile_tracking_stop_flag", stop_flag);
+      //ros::param::set("search_port/mobile_tracking_stop_flag", stop_flag);
+      ros::param::set("/renov_up_level/mobile_platform_tracking_over_flag", stop_flag);
+      int flag_tmp;
+      ros::param::get("/renov_up_level/mobile_platform_tracking_over_flag", flag_tmp);
+      ROS_WARN("The state of base %d", (int)flag_tmp);
       send_stop_flag_ = true;
     }
 

@@ -33,7 +33,7 @@ $ source <absolute-path-of-the-setup-bash-file-of-cartographer-ros>
 ```
 or simply (please check the alias setting in ~/.bashrc before using)
 ```terminal
-$ source_carto
+$ source_cart
 ```
 Start SLAM
 ```terminal
