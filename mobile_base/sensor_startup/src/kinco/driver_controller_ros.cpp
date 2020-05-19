@@ -22,9 +22,15 @@ DriverControllerROS::DriverControllerROS(ros::NodeHandle nh,
 
   stop_signal_sub_ = nh.subscribe(
       "stop_driver", 10, &DriverControllerROS::DriverStopCallback, this);
+
+  fb_thread_ = new std::thread(&DriverControllerROS::FeedbackLoop, this);
 }
 
-DriverControllerROS::~DriverControllerROS() {}
+DriverControllerROS::~DriverControllerROS() {
+  if (fb_thread_) {
+    delete fb_thread_;
+  }
+}
 
 void DriverControllerROS::ParamInit(ros::NodeHandle nh_private) {
   nh_private.param("joint_state_pub_topic", joint_state_pub_topic_,
@@ -65,6 +71,15 @@ void DriverControllerROS::DriverStopCallback(
     const std_msgs::Bool& stop_signal) {
   DriverStop();
   DriverDisenable();
+}
+
+void DriverControllerROS::FeedbackLoop() {
+  double* walk_fb;
+  double* steer_fb;
+  while (ros::ok()) {
+    GetFeedback(walk_fb, steer_fb);
+    ros::Duration(0.05).sleep();
+  }
 }
 
 }  // namespace mobile_base

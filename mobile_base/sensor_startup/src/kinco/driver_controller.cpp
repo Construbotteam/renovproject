@@ -1,5 +1,7 @@
 #include "sensor_startup/kinco/driver_controller.h"
+
 #include <unistd.h>
+
 #include <bitset>
 #include <ctime>
 
@@ -62,7 +64,6 @@ bool DriverController::DriverInit() {
 
   StartPDO();
 
-  
   GetHomePosition();
 
   if (!DriverStart()) {
@@ -301,7 +302,6 @@ void DriverController::DriverDisenable() {
 }
 
 void DriverController::DriverStop() {
-
   int* target_velocity = new int[walk_id_num_];
   for (size_t i = 0; i < walk_id_num_; i++) {
     target_velocity[i] = 0;
@@ -317,7 +317,6 @@ void DriverController::DriverStop() {
   delete[] target_position;
 
   sleep(1);
-
 }
 void DriverController::ControlMotor(
     const std::vector<double>& raw_control_signal) {
@@ -642,7 +641,7 @@ void DriverController::GetHomePosition() {
       /*          */
 
       /* this is a trick !!!!!!!!! */
-      //if_home = true;
+      // if_home = true;
       for (size_t k = 0; k < steer_id_num_; k++) {
         if_home[k] = true;
       }
@@ -663,9 +662,8 @@ void DriverController::GetHomePosition() {
 
     /******** trick !!! *********/
     if_get_fb = true;
-   
-    if (MultiFlagJudgement(if_home, steer_id_num_) && if_get_fb) {
 
+    if (MultiFlagJudgement(if_home, steer_id_num_) && if_get_fb) {
       std::cout << "home position send to driver  ";
       for (size_t i = 0; i < steer_id_num_; i++) {
         std::cout << home_position_[i] << "  ";
@@ -738,12 +736,18 @@ void DriverController::GetFeedback(double* walk_fb, double* steer_fb) {
           ByteHex2Int(&receive_obj[i].Data[4], 4);
     }
   }
-  /* this calculation is incorrect
+
+  std::cout << "velo feedback : ";
   for (size_t i = 0; i < id_num_; i++) {
-    walk_fb[i] = (double)velo_fb_int[i] / reduc_ratio_w_;
-    // steer_fb[i] =
+    std::cout << velo_fb_int[i] << "  ";
   }
-  */
+  std::cout << std::endl << std::endl;
+
+  std::cout << "position feedback : ";
+  for (size_t i = 0; i < id_num_; i++) {
+    std::cout << posi_fb_int[i] << "  ";
+  }
+  std::cout << std::endl << std::endl;
 
   delete[] velo_fb_int;
   delete[] posi_fb_int;
@@ -787,7 +791,6 @@ void DriverController::GetBaseAddress(const std::string& base_file_address) {
 }
 
 bool DriverController::MultiFlagJudgement(bool* multi_flag, const int& len) {
-
   bool final_flag = true;
   for (size_t i = 0; i < len; i++) {
     final_flag = final_flag && multi_flag[i];
@@ -797,7 +800,6 @@ bool DriverController::MultiFlagJudgement(bool* multi_flag, const int& len) {
 }
 
 bool DriverController::MultiFlagJudgement(const std::vector<bool>& multi_flag) {
-
   bool final_flag = true;
   for (size_t i = 0; i < multi_flag.size(); i++) {
     final_flag = final_flag && multi_flag[i];

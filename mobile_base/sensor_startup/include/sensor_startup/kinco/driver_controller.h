@@ -29,7 +29,8 @@ class DriverController : public CanApplication {
   void DriverDisenable();
 
   void ControlMotor(const std::vector<double>& control_signal);
-  std::vector<double> ControlSignalTransform(const std::vector<double>& raw_signal);
+  std::vector<double> ControlSignalTransform(
+      const std::vector<double>& raw_signal);
   void SendVelocity(uint* id, int* target_velocity, const int& len);
   void SendPosition(uint* id, int* target_position, const int& len);
   void SendCurrent(uint* id, int* target_current, const int& len);
