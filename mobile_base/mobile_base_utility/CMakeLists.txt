@@ -63,3 +63,6 @@ target_link_libraries(virtual_state_publisher ${catkin_LIBRARIES})
 
 add_executable(extract_test src/auto_planner/extract_test.cpp)
 target_link_libraries(extract_test auto_follow ${catkin_LIBRARIES})
+
+add_executable(imu_odom src/odometry/imu_odometry.cpp)
+target_link_libraries(imu_odom ${catkin_LIBRARIES})
