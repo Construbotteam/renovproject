@@ -23,7 +23,7 @@ DriverControllerROS::DriverControllerROS(ros::NodeHandle nh,
   stop_signal_sub_ = nh.subscribe(
       "stop_driver", 10, &DriverControllerROS::DriverStopCallback, this);
 
-  //fb_thread_ = new std::thread(&DriverControllerROS::FeedbackLoop, this);
+  fb_thread_ = new std::thread(&DriverControllerROS::FeedbackLoop, this);
 }
 
 DriverControllerROS::~DriverControllerROS() {
@@ -71,17 +71,30 @@ void DriverControllerROS::DriverStopCallback(
     const std_msgs::Bool& stop_signal) {
   DriverStop();
   DriverDisenable();
+  exit(0);
 }
 
 void DriverControllerROS::FeedbackLoop() {
-  double* walk_fb;
-  double* steer_fb;
+  double* walk_fb = new double[8];
+  double* steer_fb = new double[8];
   ros::Time t = ros::Time::now();
   while (ros::ok()) {
     std::cout << (t - ros::Time::now()).toSec() << "  ";
     GetFeedback(walk_fb, steer_fb);
+    sensor_msgs::JointState js;
+    js.header.stamp = ros::Time::now();
+    js.position.resize(8);
+    js.velocity.resize(8);
+    for (size_t i = 0; i < 8; i++) {
+      js.position[i] = steer_fb[i];
+      js.velocity[i] = walk_fb[i];
+    }
+    joint_state_pub_.publish(js);
+
     ros::Duration(0.05).sleep();
   }
+  delete[] walk_fb;
+  delete[] steer_fb;
 }
 
 }  // namespace mobile_base

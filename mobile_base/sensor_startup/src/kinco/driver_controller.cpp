@@ -556,7 +556,7 @@ void DriverController::FeedbackRequest() {
     req_data_file_.close();
   }
 
-  SendCommand(req_obj, 1);
+  SendCommand(req_obj, 1, true);
   delete req_obj;
 }
 
@@ -799,17 +799,20 @@ void DriverController::GetFeedback(double* walk_fb, double* steer_fb) {
 
   std::cout <<  "velo feedback : ";
   for (size_t i = 0; i < id_num_; i++) {
+    walk_fb[i] = velo_fb_int[i]; 
     std::cout << velo_fb_int[i] << "  ";
   }
   std::cout << std::endl << std::endl;
 
   std::cout  << "position feedback : ";
   for (size_t i = 0; i < 4; i++) {
+    steer_fb[i] = posi_fb_int[i];
     std::cout << 0 << "  "; 
   }
   for (size_t i = 4; i < id_num_; i++) {
     //double value = ((posi_fb_int[i] / M_PI) < 1e-3 ? 0.0 : (posi_fb_int[i] / M_PI));
     double value = (posi_fb_int[i] / M_PI);
+    steer_fb[i] = posi_fb_int[i];
     printf("%.2fPI  ", value);
   }
   std::cout << std::endl << std::endl;

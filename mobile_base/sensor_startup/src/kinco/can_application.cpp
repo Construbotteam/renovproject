@@ -80,9 +80,13 @@ PVCI_CAN_OBJ CanApplication::GetVciObject(const int& obj_num,
   return obj_ptr;
 }
 
-void CanApplication::SendCommand(PVCI_CAN_OBJ obj, const uint& obj_len) {
+void CanApplication::SendCommand(PVCI_CAN_OBJ obj, const uint& obj_len, bool single_frame) {
   for (size_t i = 0; i < obj_len; i++) {
-    VCI_Transmit(device_type_, device_index_, can_index_, obj, frame_len_);
+    if (!single_frame) {
+      VCI_Transmit(device_type_, device_index_, can_index_, obj, frame_len_);
+    } else {
+      VCI_Transmit(device_type_, device_index_, can_index_, obj, 1);
+    }
   }
 }
 
