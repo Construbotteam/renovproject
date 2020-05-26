@@ -240,7 +240,7 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
               final_pose.pose.position.y - goal_pose_.pose.position.y);
     double angular_err = tf::getYaw(goal_pose_.pose.orientation) -
                          tf::getYaw(final_pose.pose.orientation);
-    ROS_INFO("goal reached, position err : %.4f,  angular err : %.4f",
+    ROS_INFO("goal reached, position err : %.4fm,  angular err : %.4f-degree",
              position_err, angular_err / M_PI * 180.0);
 
     int stop_flag = 1;
