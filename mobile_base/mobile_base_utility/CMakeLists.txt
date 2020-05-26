@@ -16,6 +16,8 @@ find_package(
              map_server)
 
 find_package(yaml-cpp REQUIRED)
+find_package(PCL 1.9 REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
 
 catkin_package(
   # INCLUDE_DIRS include
@@ -66,3 +68,6 @@ target_link_libraries(extract_test auto_follow ${catkin_LIBRARIES})
 
 add_executable(imu_odom src/odometry/imu_odometry.cpp)
 target_link_libraries(imu_odom ${catkin_LIBRARIES})
+
+add_executable(icp_odom src/odometry/icp_odometry.cpp)
+target_link_libraries(icp_odom ${catkin_LIBRARIES} ${PCL_LIBRARIES})
