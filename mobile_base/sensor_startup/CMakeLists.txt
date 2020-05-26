@@ -35,7 +35,7 @@ add_library(sensor_reader
 )
 target_link_libraries(sensor_reader
   yaml-cpp
-  controlcan
+  usbcan
   ${catkin_LIBRARIES}
 )
 
@@ -43,12 +43,12 @@ target_link_libraries(sensor_reader
 add_executable(imu_reader_node src/imu_reader_node.cpp)
 target_link_libraries(imu_reader_node
   sensor_reader
-  controlcan
+  usbcan
   ${catkin_LIBRARIES}
 )
 
 add_executable(abs_encoder src/test/abs_encoder.cpp)
-target_link_libraries(abs_encoder controlcan ${catkin_LIBRARIES})
+target_link_libraries(abs_encoder usbcan ${catkin_LIBRARIES})
 
 add_executable(stop_motor src/test/stop_motor.cpp)
 target_link_libraries(stop_motor ${catkin_LIBRARIES})
@@ -60,7 +60,7 @@ add_executable(vary_velo_test src/test/vary_velo_test.cpp  )
 target_link_libraries(vary_velo_test ${catkin_LIBRARIES})
 
 add_executable(test_can src/test/test_can.cpp  )
-target_link_libraries(test_can controlcan ${catkin_LIBRARIES})
+target_link_libraries(test_can usbcan ${catkin_LIBRARIES})
 
 
 add_executable(walking_demo src/test/walking_demo)
