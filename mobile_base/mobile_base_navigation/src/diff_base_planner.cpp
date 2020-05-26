@@ -191,13 +191,14 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
   std::vector<geometry_msgs::PoseStamped> new_path;
 
   bool plan_again;
+//  ROS_INFO("way block time : %.3f", fabs(ros::Time::now().toSec() - way_block_time_.toSec())); 
   if (!if_reach_goal_) {
-    plan_again = fabs(ros::Time::now().toSec() - way_block_time_.toSec()) > 1.0;
+    plan_again = fabs(ros::Time::now().toSec() - way_block_time_.toSec()) > 3.5;
   } else {
     plan_again = false;
   }
 
-  plan_again = false;
+//  plan_again = false;
 
   if (if_get_goal_ || plan_again) {
     global_plan_.clear();
@@ -277,6 +278,8 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
   valid_traj_ = base_local_planner_.checkTrajectory(vx_check, vy_check, 0.0);
   if (valid_traj_) {
     way_block_time_ = ros::Time::now();
+  } else {
+    ROS_WARN("Invalid path!!!");
   }
   diff_local_planner_.getCollision(!valid_traj_);
 

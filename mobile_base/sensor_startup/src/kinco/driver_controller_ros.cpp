@@ -23,7 +23,7 @@ DriverControllerROS::DriverControllerROS(ros::NodeHandle nh,
   stop_signal_sub_ = nh.subscribe(
       "stop_driver", 10, &DriverControllerROS::DriverStopCallback, this);
 
-  fb_thread_ = new std::thread(&DriverControllerROS::FeedbackLoop, this);
+  //fb_thread_ = new std::thread(&DriverControllerROS::FeedbackLoop, this);
 }
 
 DriverControllerROS::~DriverControllerROS() {
@@ -76,7 +76,9 @@ void DriverControllerROS::DriverStopCallback(
 void DriverControllerROS::FeedbackLoop() {
   double* walk_fb;
   double* steer_fb;
+  ros::Time t = ros::Time::now();
   while (ros::ok()) {
+    std::cout << (t - ros::Time::now()).toSec() << "  ";
     GetFeedback(walk_fb, steer_fb);
     ros::Duration(0.05).sleep();
   }

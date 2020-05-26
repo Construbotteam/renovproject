@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="freq" default="5" />
-  <param name="imu_publish_rate" value="15"/>
+  <param name="imu_publish_rate" value="50"/>
   <node pkg="sensor_startup" type="imu_reader_node" name="imu_reader" output="screen">
     <param name="port_id" value="/dev/ttyUSB0" />
     <param name="baud_rate" value="115200" />
@@ -9,7 +9,7 @@
     <param name="imu_pub_topic" value="imu"/>
     <param name="use_request" value="false"/>
     <!-- output_freq should only be : 5 15 25 35 50 100 -->
-    <param name="output_freq" value="15"/>
+    <param name="output_freq" value="50"/>
     <param name="use_debug" value="false" />
   </node>
 

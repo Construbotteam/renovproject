@@ -1,9 +1,11 @@
 #include "sensor_startup/kinco/driver_controller.h"
+#include <iomanip>
 
 #include <unistd.h>
 
 #include <bitset>
 #include <ctime>
+#include <fstream>
 
 namespace mobile_base {
 
@@ -438,16 +440,16 @@ std::vector<double> DriverController::ControlSignalTransform(
   }
 
   // determine the steering command
-  std::cout << "sign of steering is : ";
+  //std::cout << "sign of steering is : ";
   for (size_t i = walk_id_num_; i < id_num_; i++) {
     double delta = raw_signal[i] * reduc_ratio_s_ * frequency_multiplier_ *
                    encoder_s_ / (2 * M_PI);
     double tmp =
         home_position_[i - walk_id_num_] + delta * pow(-1, motor_sign_[i] + 1);
-    std::cout << pow(-1, motor_sign_[i] + 1) << "  ";
+    //std::cout << pow(-1, motor_sign_[i] + 1) << "  ";
     signal.push_back(tmp);
   }
-  std::cout << std::endl;
+  //std::cout << std::endl;
   // std::cout << std::dec << "fm : " << frequency_multiplier_ << "  encod_w : "
   // << encoder_w_ << " reduc ratio: " << reduc_ratio_w_ << std::endl; std::cout
   // << raw_signal[0] << std::endl; std::cout << signal[0] << std::endl;
@@ -725,27 +727,90 @@ void DriverController::GetFeedback(double* walk_fb, double* steer_fb) {
   int receive_obj_len = 2000;
   PVCI_CAN_OBJ receive_obj = new VCI_CAN_OBJ[receive_obj_len];
   GetData(receive_obj, receive_obj_len);
+  //ClearBuffer();
 
-  int* velo_fb_int = new int[id_num_];
-  int* posi_fb_int = new int[id_num_];
+  double* velo_fb_int = new double[id_num_];
+  double* posi_fb_int = new double[id_num_];
   for (size_t i = 0; i < receive_obj_len; i++) {
     if (abs(receive_obj[i].ID - TPDO2_ID) <= id_num_) {
+//      std::cout << std::hex << "0x" << receive_obj[i].ID << "  ";
       velo_fb_int[receive_obj[i].ID - TPDO2_ID - 1] =
           ByteHex2Int(&receive_obj[i].Data[0], 4);
       posi_fb_int[receive_obj[i].ID - TPDO2_ID - 1] =
           ByteHex2Int(&receive_obj[i].Data[4], 4);
     }
   }
+ // std::cout << std::endl;
+  int count_tmp = 0;
+  int ind_tmp = 0;
+  while (true) {
+    if ((int)receive_obj[ind_tmp].ID != 0) {
+      count_tmp++;
+    } else {
+      break;
+    }
+    if (ind_tmp >= receive_obj_len) break;
+    ind_tmp++;
+  }
 
-  std::cout << "velo feedback : ";
+  std::ofstream out("/home/curi/Desktop/test_fb.txt");
+  for (size_t i = 0; i < 30; i++) {
+    //if (abs(receive_obj[i].ID - TPDO2_ID) <= id_num_) {
+    if (true) {
+      out << "0x" << std::hex << receive_obj[i].ID << " :  ";
+      out << std::hex << (int)receive_obj[i].Data[0] << "  "
+          << (int)receive_obj[i].Data[1] << "  "
+          << (int)receive_obj[i].Data[2] << "  "
+          << (int)receive_obj[i].Data[3] << "  "
+          << (int)receive_obj[i].Data[4] << "  "
+          << (int)receive_obj[i].Data[5] << "  "
+          << (int)receive_obj[i].Data[7] << "  "
+          << (int)receive_obj[i].Data[8] << std::endl;
+    }
+  }
+  out.close();
+  
+  std::cout << "home position :  ";
+  std::cout << std::dec;
+  for (size_t i = 0; i < 4; i++) {
+    std::cout << (int)home_position_[i] << "  ";
+  }
+  std::cout << std::endl;
+  for (size_t i = 0; i < 4; i++) {
+    int inter_tmp = velo_fb_int[i];
+    velo_fb_int[i] = posi_fb_int[i];
+    posi_fb_int[i] = inter_tmp;
+  }
+
+  for (size_t i = 0; i < id_num_; i++) {
+    velo_fb_int[i] *= pow(-1, motor_sign_[i] + 1);
+    velo_fb_int[i] = (double)(velo_fb_int[i] * 1875) / (double)(encoder_w_ * frequency_multiplier_ * 512) / (double)reduc_ratio_w_;
+  }
+
+  std::cout << "raw position : ";
+  for (size_t i = 4; i < id_num_; i++) {
+  std::cout << posi_fb_int[i] << "  ";
+    posi_fb_int[i] -= (int)home_position_[i-4];
+    posi_fb_int[i] *= pow(-1, motor_sign_[i] + 1);
+    posi_fb_int[i] = (double)posi_fb_int[i] * (2 * M_PI) / (double)(reduc_ratio_s_ * frequency_multiplier_ * encoder_s_); 
+  }
+  std::cout << std::endl;
+
+
+  std::cout <<  "velo feedback : ";
   for (size_t i = 0; i < id_num_; i++) {
     std::cout << velo_fb_int[i] << "  ";
   }
   std::cout << std::endl << std::endl;
 
-  std::cout << "position feedback : ";
-  for (size_t i = 0; i < id_num_; i++) {
-    std::cout << posi_fb_int[i] << "  ";
+  std::cout  << "position feedback : ";
+  for (size_t i = 0; i < 4; i++) {
+    std::cout << 0 << "  "; 
+  }
+  for (size_t i = 4; i < id_num_; i++) {
+    //double value = ((posi_fb_int[i] / M_PI) < 1e-3 ? 0.0 : (posi_fb_int[i] / M_PI));
+    double value = (posi_fb_int[i] / M_PI);
+    printf("%.2fPI  ", value);
   }
   std::cout << std::endl << std::endl;
 

@@ -191,11 +191,13 @@ void ImuReader::ReadDataCallback(const ros::TimerEvent&) {
     std::vector<uint8_t> imu_data;
     std::vector<uint8_t> imu_data_tmp;
     while (true) {
+    /*
       if (imu_ser.available() < 32) {
         ROS_WARN("data in buffer is : %d which is not enough",
                  (int)imu_ser.available());
         break;
       }
+      */
       imu_ser.read(imu_data_tmp, 1);
       if (0x68 == imu_data_tmp[0]) {
         imu_data_tmp.clear();

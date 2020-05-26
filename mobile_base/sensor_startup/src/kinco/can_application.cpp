@@ -97,3 +97,7 @@ void CanApplication::GetData(PVCI_CAN_OBJ obj, const int& obj_len) {
   int receive_num = VCI_Receive(device_type_, device_index_, can_index_, obj,
                                 obj_len, wait_time_);
 }
+
+void CanApplication::ClearBuffer() {
+  VCI_ClearBuffer(device_type_, device_index_, can_index_);
+}

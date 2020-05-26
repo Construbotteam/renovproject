@@ -30,6 +30,7 @@ class CanApplication {
   PVCI_CAN_OBJ GetVciObject(const int& obj_num, const uint& initial_id);
   void SendCommand(PVCI_CAN_OBJ obj, const uint& len);
   void GetData(PVCI_CAN_OBJ obj, const int& obj_len);
+  void ClearBuffer();
 
  private:
   void LoadConfig(const std::string& file_address);
