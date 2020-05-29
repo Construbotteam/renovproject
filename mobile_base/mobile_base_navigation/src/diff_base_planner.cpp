@@ -205,9 +205,23 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
     if (!base_global_planner_.makePlan(start, goal_pose_, global_plan_) ||
         !breaker_.breakPath(global_plan_, new_path)) {
       if_get_goal_ = false;
-      ROS_WARN(
-          "plan failure by base global planner, please offer a goal again");
-      return;
+
+      double sec = 2.0;
+      ROS_WARN("Plan failure, wait for %.2fsecs to plan again", sec);
+      ros::Duration(sec).sleep();
+
+      if (!base_global_planner_.makePlan(start, goal_pose_, global_plan_) ||
+          !breaker_.breakPath(global_plan_, new_path)) {
+        global_costmap_ros_ptr_->resetLayers();
+        ros::Duration(1.0).sleep();
+        if (!base_global_planner_.makePlan(start, goal_pose_, global_plan_) ||
+            !breaker_.breakPath(global_plan_, new_path)) {
+          ROS_WARN(
+              "plan failure by base global planner, please offer a goal again");
+          return;
+        }
+      }
+
     } else if (global_plan_.size() < 2 ||
                !diff_local_planner_.setPlan(new_path) ||
                !base_local_planner_.setPlan(new_path)) {
@@ -215,7 +229,26 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
                (int)global_plan_.size());
       return;
     } else {
-      diff_local_planner_.enableFirstRotation();
+      double path_length = 0;
+      for (size_t i = 0; i < new_path.size() - 1; i++) {
+        path_length += hypot(
+            new_path[i].pose.position.x - new_path[i + 1].pose.position.x,
+            new_path[i].pose.position.y - new_path[i + 1].pose.position.y);
+      }
+      double steer_angle = angles::shortest_angular_distance(
+          tf::getYaw(start.pose.orientation),
+          tf::getYaw(new_path[0].pose.orientation));
+      if (fabs(steer_angle) < M_PI_2 && path_length < 0.55) {
+        sensor_msgs::JointState js_msg;
+        js_msg.position.resize(8);
+        js_msg.velocity.resize(8);
+        js_msg.position = {0,           0,           0,           0,
+                           steer_angle, steer_angle, steer_angle, steer_angle};
+        js_msg.velocity = {0, 0, 0, 0, 0, 0, 0, 0};
+        ros::Duration(3.0).sleep();
+      } else {
+        diff_local_planner_.enableFirstRotation();
+      }
       ROS_INFO("make global plan and set it local planner");
     }
     if_get_goal_ = false;
