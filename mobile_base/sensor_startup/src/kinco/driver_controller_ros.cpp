@@ -23,7 +23,7 @@ DriverControllerROS::DriverControllerROS(ros::NodeHandle nh,
   stop_signal_sub_ = nh.subscribe(
       "stop_driver", 10, &DriverControllerROS::DriverStopCallback, this);
 
-  //fb_thread_ = new std::thread(&DriverControllerROS::FeedbackLoop, this);
+  fb_thread_ = new std::thread(&DriverControllerROS::FeedbackLoop, this);
 }
 
 DriverControllerROS::~DriverControllerROS() {

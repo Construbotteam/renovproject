@@ -28,7 +28,7 @@ class CanApplication {
    */
   void ActivateCAN(const std::string& file_address);
   PVCI_CAN_OBJ GetVciObject(const int& obj_num, const uint& initial_id);
-  void SendCommand(PVCI_CAN_OBJ obj, const uint& len);
+  void SendCommand(PVCI_CAN_OBJ obj, const uint& len, bool single_frame = false);
   void GetData(PVCI_CAN_OBJ obj, const int& obj_len);
   void ClearBuffer();
 

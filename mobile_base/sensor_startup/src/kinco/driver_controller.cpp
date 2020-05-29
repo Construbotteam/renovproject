@@ -556,7 +556,7 @@ void DriverController::FeedbackRequest() {
     req_data_file_.close();
   }
 
-  SendCommand(req_obj, 1);
+  SendCommand(req_obj, 1, true);
   delete req_obj;
 }
 
