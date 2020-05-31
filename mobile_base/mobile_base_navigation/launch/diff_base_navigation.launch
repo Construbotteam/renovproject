@@ -36,7 +36,7 @@
 		<param name="$(arg planner_lns)/control_freq" value="$(arg freq)" />
 		<param name="$(arg planner_gns)/use_dijkstra" value="true" />
 		<param name="$(arg planner_lns)/meter_scoring" value="true" />
-	<!--	<remap from="$(arg path_sub_topic)" to="renov_down_mobile/mobile_go_to_point" />-->
-		<remap from="$(arg path_sub_topic)" to="move_base_simple/goal" />
+		<remap from="$(arg path_sub_topic)" to="renov_down_mobile/mobile_go_to_point" />
+	<!--	<remap from="$(arg path_sub_topic)" to="move_base_simple/goal" />-->
 	</node>
 </launch>

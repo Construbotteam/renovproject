@@ -229,6 +229,7 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
                (int)global_plan_.size());
       return;
     } else {
+    /*
       double path_length = 0;
       for (size_t i = 0; i < new_path.size() - 1; i++) {
         path_length += hypot(
@@ -247,8 +248,9 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
         js_msg.velocity = {0, 0, 0, 0, 0, 0, 0, 0};
         ros::Duration(3.0).sleep();
       } else {
+      */
         diff_local_planner_.enableFirstRotation();
-      }
+      //}
       ROS_INFO("make global plan and set it local planner");
     }
     if_get_goal_ = false;
