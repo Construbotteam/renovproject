@@ -80,3 +80,6 @@ target_link_libraries(rot_traj sensor_reader yaml-cpp ${catkin_LIBRARIES})
 
 add_executable(param_list_test src/test/param_list_test.cpp)
 target_link_libraries(param_list_test sensor_reader yaml-cpp ${catkin_LIBRARIES})
+
+add_executable(test_can_com test/test_can_com.cpp)
+target_link_libraries(test_can_com sensor_reader ${catkin_LIBRARIES})

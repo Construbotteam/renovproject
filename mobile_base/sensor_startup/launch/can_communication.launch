@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="can_config_addr" value="$(find sensor_startup)/param/kinco/can_config.yaml"/>
+  <param name="read_buffer_length" value="200" />
+  <param name="driver_num" value="8" />
+  <param name="pdo_num" value="3" />
+  <param name="rate" value="10" />
+  <param name="loop_limit" value="10" />
+  <node pkg="sensor_startup" type="test_can_com" name="test_can_com" >
+  </node>
+  
+
+</launch>

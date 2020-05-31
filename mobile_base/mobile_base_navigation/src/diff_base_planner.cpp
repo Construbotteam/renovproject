@@ -219,7 +219,13 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
           ROS_WARN(
               "plan failure by base global planner, please offer a goal again");
           return;
+        } else {
+          diff_local_planner_.setPlan(new_path);
+          base_local_planner_.setPlan(new_path);
         }
+      } else {
+        diff_local_planner_.setPlan(new_path);
+        base_local_planner_.setPlan(new_path);
       }
 
     } else if (global_plan_.size() < 2 ||
