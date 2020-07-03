@@ -198,7 +198,7 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
     plan_again = false;
   }
 
-//  plan_again = false;
+  plan_again = false;
 
   if (if_get_goal_ || plan_again) {
     global_plan_.clear();
@@ -235,7 +235,6 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
                (int)global_plan_.size());
       return;
     } else {
-    /*
       double path_length = 0;
       for (size_t i = 0; i < new_path.size() - 1; i++) {
         path_length += hypot(
@@ -246,17 +245,29 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
           tf::getYaw(start.pose.orientation),
           tf::getYaw(new_path[0].pose.orientation));
       if (fabs(steer_angle) < M_PI_2 && path_length < 0.55) {
+        ROS_INFO("steer angle : %.3f", steer_angle);
         sensor_msgs::JointState js_msg;
+	js_msg.header.frame_id = "wheel";
+	js_msg.header.stamp = ros::Time::now();
+        js_msg.name = {"w1", "w2", "w3", "w4", "s1", "s2", "s3", "s4"};
+
         js_msg.position.resize(8);
-        js_msg.velocity.resize(8);
+	js_msg.velocity.resize(8);
         js_msg.position = {0,           0,           0,           0,
                            steer_angle, steer_angle, steer_angle, steer_angle};
         js_msg.velocity = {0, 0, 0, 0, 0, 0, 0, 0};
+
+	js_pub_.publish(js_msg);
+        ros::Duration(0.5).sleep();
+	js_pub_.publish(js_msg);
+
         ros::Duration(3.0).sleep();
+	pre_state_ = mobile_base::MoveStraight;
+//	diff_local_planner_.setMoveState(mobile_base::MoveStraight);
       } else {
-      */
+      
         diff_local_planner_.enableFirstRotation();
-      //}
+      }
       ROS_INFO("make global plan and set it local planner");
     }
     if_get_goal_ = false;
@@ -350,7 +361,7 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
       };
       pre_state_ = cur_state;
       js_pub_.publish(js_msg);
-      ros::Duration(2.0).sleep();
+      ros::Duration(3.0).sleep();
       return;
     } else {
       js_msg.velocity = {-pure_rot_v_, pure_rot_v_, -pure_rot_v_, pure_rot_v_,
@@ -367,7 +378,7 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
       };
     }
   } else if (cur_state == mobile_base::MoveForward) {
-    if (cur_state != pre_state_) {
+    if (cur_state != pre_state_ && pre_state_ == mobile_base::PureRotation) {
       js_msg.velocity = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
       js_msg.position = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 

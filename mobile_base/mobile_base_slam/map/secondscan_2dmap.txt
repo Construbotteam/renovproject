@@ -1,0 +1,13 @@
+SCENE Overview Map Information 
+
+Associated TIF file: C:\Users\GEILI\Desktop\20200609?????\14.tif
+
+Pixel/m: 64
+Image size: 8, 12 m
+
+Image size in pixel: 512 x 768
+
+Top Left Corner: (-4, 4, 0)
+Top Right Corner: (4, 4, 0)
+Bottom Left Corner: (-4, -8, 0)
+Bottom Right Corner: (4, -8, 0)

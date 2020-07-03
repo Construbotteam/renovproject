@@ -65,7 +65,7 @@ void DiffPlanner::paramInit(ros::NodeHandle& nh_private) {
   nh_private.param("map_frame_id", map_frame_id_, std::string("map"));
   // velocity limit
   nh_private.param("max_v", max_v_, 0.5);
-  nh_private.param("min_v", min_v_, 0.03);
+  nh_private.param("min_v", min_v_, 0.01);
   nh_private.param("max_theta", max_theta_v_, 0.5);
   nh_private.param("min_theta", min_theta_v_, 0.08);
   nh_private.param("pure_rotation_max_theta_v_", pure_rotation_max_theta_v_,

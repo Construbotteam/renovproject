@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Arguments -->
+  <arg name="map_file" default="$(find mobile_base_slam)/map/secondscan_2dmap.yaml"/>
+  <!-- Map server -->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/>
+
+  <!-- AMCL -->
+  <include file="$(find mobile_base_slam)/launch/amcl.launch"/>
+</launch>

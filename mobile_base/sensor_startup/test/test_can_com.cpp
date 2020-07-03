@@ -18,6 +18,7 @@ int main(int argc, char** argv) {
   nh.param("loop_limit", loop_limit, 10);
 
   can_app.ActivateCAN(can_config_addr);
+  ROS_INFO("activate");
   PVCI_CAN_OBJ obj = can_app.GetVciObject(1, 0x80);
   obj->DataLen = 0;
 

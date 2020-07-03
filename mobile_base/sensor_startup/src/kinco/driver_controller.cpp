@@ -724,9 +724,27 @@ void DriverController::GetFeedback(double* walk_fb, double* steer_fb) {
   FeedbackRequest();
   usleep(10000);
 
-  int receive_obj_len = 2000;
+  int receive_obj_len = 500;
   PVCI_CAN_OBJ receive_obj = new VCI_CAN_OBJ[receive_obj_len];
   GetData(receive_obj, receive_obj_len);
+
+  int ct = 0;
+  for (size_t i = 0; i < receive_obj_len; i++) {
+    if (receive_obj[i].ID != 0x0) {
+      ct++;
+    }
+  }
+  if (ct > 24) {
+    std::ofstream ofs("/home/curi/Desktop/error_record.txt", std::ios::app);
+    ofs << ct << "messages : ";
+    for (size_t i = 0; i < receive_obj_len; i++) {
+      if (receive_obj[i].ID != 0x0) {
+        ofs << std::hex << "0x" << (int)receive_obj[i].ID << "  ";
+      }
+    }
+    ofs << std::endl;
+    ofs.close();
+  }
   //ClearBuffer();
 
   double* velo_fb_int = new double[id_num_];
@@ -770,6 +788,11 @@ void DriverController::GetFeedback(double* walk_fb, double* steer_fb) {
   }
   out.close();
   
+  if (ct == 24) {
+    std::cout << ct << "  ";
+  } else {
+    std::cout << "=========================" << ct <<"=========================" << std::endl; 
+  }
   std::cout << "home position :  ";
   std::cout << std::dec;
   for (size_t i = 0; i < 4; i++) {

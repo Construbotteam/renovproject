@@ -16,7 +16,7 @@ find_package(
              map_server)
 
 find_package(yaml-cpp REQUIRED)
-find_package(PCL 1.9 REQUIRED)
+find_package(PCL REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS})
 
 catkin_package(

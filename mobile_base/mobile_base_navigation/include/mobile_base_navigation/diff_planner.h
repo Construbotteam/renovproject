@@ -51,7 +51,7 @@ struct ControlError {
   double integ_err_;
 };  // struct ControlError
 
-enum MoveState { MoveForward, PureRotation };  // enum MoveState
+enum MoveState { MoveForward, PureRotation, MoveStraight };  // enum MoveState
 
 class DiffPlanner : public nav_core::BaseLocalPlanner {
  public:
@@ -77,6 +77,8 @@ class DiffPlanner : public nav_core::BaseLocalPlanner {
   double getMinV();
   double getMaxThetaV();
   double getMinThetaV();
+
+  void setMoveState(const MoveState& state) { move_state_ = state; }
   MoveState getMoveState();
 
   void rotateToGoal(const geometry_msgs::PoseStamped &global_pose,

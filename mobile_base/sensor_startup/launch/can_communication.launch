@@ -6,7 +6,7 @@
   <param name="pdo_num" value="3" />
   <param name="rate" value="10" />
   <param name="loop_limit" value="10" />
-  <node pkg="sensor_startup" type="test_can_com" name="test_can_com" >
+  <node pkg="sensor_startup" type="test_can_com" name="test_can_com" output="screen">
   </node>
   
 

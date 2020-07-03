@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+  <node pkg="mobile_base_utility" type="wall_follow_ros_node" name="wall_follow_ros_node" output="screen" >
+  </node>
+  
+</launch>
