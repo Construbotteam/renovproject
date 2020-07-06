@@ -14,7 +14,6 @@ void CanApplication::LoadConfig(const std::string& file_address) {
   can_index_ = can_config["can_index"].as<int>();
   wait_time_ = can_config["wait_time"].as<int>();
   frame_len_ = can_config["frame_len"].as<int>();
-
 }
 
 void CanApplication::ActivateCAN(const std::string& file_address) {
@@ -80,9 +79,14 @@ PVCI_CAN_OBJ CanApplication::GetVciObject(const int& obj_num,
   return obj_ptr;
 }
 
-void CanApplication::SendCommand(PVCI_CAN_OBJ obj, const uint& obj_len) {
+void CanApplication::SendCommand(PVCI_CAN_OBJ obj, const uint& obj_len,
+                                 const bool& single_frame) {
   for (size_t i = 0; i < obj_len; i++) {
-    VCI_Transmit(device_type_, device_index_, can_index_, obj, frame_len_);
+    if (!single_frame) {
+      VCI_Transmit(device_type_, device_index_, can_index_, obj, frame_len_);
+    } else {
+      VCI_Transmit(device_type_, device_index_, can_index_, obj, 1);
+    }
   }
 }
 

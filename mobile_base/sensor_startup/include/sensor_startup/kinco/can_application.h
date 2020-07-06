@@ -2,6 +2,7 @@
 #define CAN_APPLICATION_H
 
 #include <yaml-cpp/yaml.h>
+
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -28,7 +29,8 @@ class CanApplication {
    */
   void ActivateCAN(const std::string& file_address);
   PVCI_CAN_OBJ GetVciObject(const int& obj_num, const uint& initial_id);
-  void SendCommand(PVCI_CAN_OBJ obj, const uint& len);
+  void SendCommand(PVCI_CAN_OBJ obj, const uint& len,
+                   const bool& single_frame = false);
   void GetData(PVCI_CAN_OBJ obj, const int& obj_len);
 
  private:
