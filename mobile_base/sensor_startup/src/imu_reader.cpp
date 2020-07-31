@@ -1,297 +1,251 @@
 #include "sensor_startup/imu_reader.h"
-#include <fstream>
 
-using mobile_base::ImuReader;
+namespace mobile_base {
 
-ImuReader::ImuReader(ros::NodeHandle& nh, ros::NodeHandle& nh_private) {
-  ParamInit(nh_private);
-  SerialInit();
+ImuReader::ImuReader(ros::NodeHandle& nh, ros::NodeHandle& nh_private)
+    : get_first_imu_data_(false) {
+  initParam(nh_private);
+  initSerial();
 
-  ROS_INFO("port_id : %s ", port_id.c_str());
-  ROS_INFO("baud_rate : %d", baud_rate);
-  ROS_INFO("imu_frame_id : %s", imu_frame_id.c_str());
-  ROS_INFO("imu_pub_topic : %s", imu_pub_topic.c_str());
+  ROS_INFO("IMU port id : %s ", port_id_.c_str());
+  ROS_INFO("IMU baud rate : %d", baud_rate_);
+  ROS_INFO("IMU frame : %s", imu_frame_.c_str());
+  ROS_INFO("IMU publish topic : %s", imu_pub_topic_.c_str());
+  ROS_INFO("IMU output frequency : %d", output_freq_);
 
-  imu_pub = nh.advertise<sensor_msgs::Imu>(imu_pub_topic, 100);
-  imu_timer = nh.createTimer(ros::Duration(1.0 / output_freq),
-                             &ImuReader::ReadDataCallback, this);
+  imu_pub_ = nh.advertise<sensor_msgs::Imu>(imu_pub_topic_, 100);
+  th_ = new std::thread(&ImuReader::readLoop, this);
 }
 
-void ImuReader::TestReader() {
-  ROS_INFO("data num in buffer is : %d ", (int)imu_ser.available());
-  std::vector<uint8_t> data;
-  data.clear();
-
-  imu_ser.read(data, imu_ser.available());
-  std::ofstream out("/home/glh/Desktop/test_imu.txt", std::ios::app);
-  out << ros::Time::now().toSec() << " : ";
-  for (size_t i = 0; i < data.size(); i++) {
-    out << std::hex << "0x" << (int)data[i] << "  ";
-  }
-  out << std::endl;
-  out.close();
-}
-
-void ImuReader::SerialInit() {
-  // get imu port id from ros parameter lsit
-  /*
-  ros::NodeHandle nh_getport("search_port");
-  nh_getport.setParam("imu_port_ok_fl", 2);
-  int imu_port_ok_flag = false;
-  while (true) {
-    if (!nh_getport.getParam("imu_port_ok_flag", imu_port_ok_flag)) {
-      std::cout << "imu port id flag is : " << imu_port_ok_flag << " not ok!!"
-  << std::endl; ros::Duration(0.5).sleep(); imu_port_ok_flag = false; continue;
-    }
-    if (imu_port_ok_flag == 1 && nh_getport.getParam("imu_port", port_id)) {
-      ROS_INFO("get imu port id : %s", port_id.c_str());
-      break;
-    }
-  }
-  */
-
+void ImuReader::initSerial() {
   try {
-    imu_ser.setPort(port_id);
-    imu_ser.setBaudrate(baud_rate);
-    imu_ser.setParity(serial::parity_none);
+    imu_ser_.setPort(port_id_);
+    imu_ser_.setBaudrate(baud_rate_);
+    imu_ser_.setParity(serial::parity_none);
     serial::Timeout time_out = serial::Timeout::simpleTimeout(1000);
-    imu_ser.setTimeout(time_out);
-    imu_ser.open();
+    imu_ser_.setTimeout(time_out);
+    imu_ser_.open();
   } catch (const serial::IOException& e) {
-    ROS_ERROR("Unable to open port on %s -> [%s]", port_id.c_str(), e.what());
+    ROS_ERROR("Unable to open port on %s -> [%s]", port_id_.c_str(), e.what());
     return;
   }
-  if (imu_ser.isOpen()) {
-    ROS_INFO("Open serial port successfully");
 
-    if (use_request) {
-      imu_ser.write(cmd.OUTPUT_FREQUENCY_00HZ,
-                    sizeof(cmd.OUTPUT_FREQUENCY_00HZ));
-      ROS_INFO("set the frequency as 0 Hz");
+  if (imu_ser_.isOpen()) {
+    ROS_INFO("Open serial port %s successfully", port_id_.c_str());
+
+    if (use_request_) {
+      imu_ser_.write(cmd_.OUTPUT_FREQUENCY_00HZ,
+                     sizeof(cmd_.OUTPUT_FREQUENCY_00HZ));
+      ROS_INFO("Set the frequency as 0 Hz");
       ros::Duration(0.01).sleep();
     } else {
-      switch (output_freq) {
+      switch (output_freq_) {
         case 5: {
-          imu_ser.write(cmd.OUTPUT_FREQUENCY_05HZ,
-                        sizeof(cmd.OUTPUT_FREQUENCY_05HZ));
-          ROS_INFO("set the frequency as 5 Hz");
+          imu_ser_.write(cmd_.OUTPUT_FREQUENCY_05HZ,
+                         sizeof(cmd_.OUTPUT_FREQUENCY_05HZ));
+          ROS_INFO("Set the frequency as 5 Hz");
           ros::Duration(0.01).sleep();
           break;
         }
         case 15: {
-          imu_ser.write(cmd.OUTPUT_FREQUENCY_15HZ,
-                        sizeof(cmd.OUTPUT_FREQUENCY_15HZ));
-          ROS_INFO("set the frequency as 15 Hz");
+          imu_ser_.write(cmd_.OUTPUT_FREQUENCY_15HZ,
+                         sizeof(cmd_.OUTPUT_FREQUENCY_15HZ));
+          ROS_INFO("Set the frequency as 15 Hz");
           ros::Duration(0.01).sleep();
           break;
         }
         case 25: {
-          imu_ser.write(cmd.OUTPUT_FREQUENCY_25HZ,
-                        sizeof(cmd.OUTPUT_FREQUENCY_25HZ));
-          ROS_INFO("set the frequency as 25 Hz");
+          imu_ser_.write(cmd_.OUTPUT_FREQUENCY_25HZ,
+                         sizeof(cmd_.OUTPUT_FREQUENCY_25HZ));
+          ROS_INFO("Set the frequency as 25 Hz");
           ros::Duration(0.01).sleep();
           break;
         }
         case 35: {
-          imu_ser.write(cmd.OUTPUT_FREQUENCY_35HZ,
-                        sizeof(cmd.OUTPUT_FREQUENCY_35HZ));
-          ROS_INFO("set the frequency as 35 Hz");
+          imu_ser_.write(cmd_.OUTPUT_FREQUENCY_35HZ,
+                         sizeof(cmd_.OUTPUT_FREQUENCY_35HZ));
+          ROS_INFO("Set the frequency as 35 Hz");
           ros::Duration(0.01).sleep();
           break;
         }
         case 50: {
-          imu_ser.write(cmd.OUTPUT_FREQUENCY_50HZ,
-                        sizeof(cmd.OUTPUT_FREQUENCY_50HZ));
-          ROS_INFO("set the frequency as 50 Hz");
+          imu_ser_.write(cmd_.OUTPUT_FREQUENCY_50HZ,
+                         sizeof(cmd_.OUTPUT_FREQUENCY_50HZ));
+          ROS_INFO("Set the frequency as 50 Hz");
           ros::Duration(0.01).sleep();
           break;
         }
         case 100: {
-          imu_ser.write(cmd.OUTPUT_FREQUENCY_100HZ,
-                        sizeof(cmd.OUTPUT_FREQUENCY_100HZ));
-          ROS_INFO("set the frequency as 100 Hz");
+          imu_ser_.write(cmd_.OUTPUT_FREQUENCY_100HZ,
+                         sizeof(cmd_.OUTPUT_FREQUENCY_100HZ));
+          ROS_INFO("Set the frequency as 100 Hz");
           ros::Duration(0.01).sleep();
           break;
         }
         default: {
-          ROS_WARN("incorrect frequency number");
-          exit(1);
+          ROS_WARN(
+              "Incorrect frequency number! Value of Hz should be chosen within "
+              "range [5, 15, 25, 35, 50, 100]");
+          exit(0);
           break;
         }
       }
     }
-    /*(
-    std::cout << "I got reply as : ";
-    for (size_t i = 0; i < imu_reply.size(); i++) {
-      std::cout << std::hex << "0x" << (int)imu_reply[i] << "  ";
-    }
-    std::cout << std::endl;
-    */
   } else {
-    ROS_WARN("Port opening failed!");
+    ROS_WARN("Open port %s failure!", port_id_.c_str());
     return;
   }
 }
 
-void ImuReader::ParamInit(ros::NodeHandle& nh_private) {
-  if (!nh_private.getParam("port_id", port_id)) {
-    port_id = "/dev/ttyUSB0";
+void ImuReader::initParam(ros::NodeHandle& nh_private) {
+  nh_private.param("port_id", port_id_, std::string("/dev/ttyUSB0"));
+  nh_private.param("baud_rate", baud_rate_, 115200);
+  nh_private.param("imu_frame", imu_frame_, std::string("base_imu"));
+  nh_private.param("imu_pub_topic", imu_pub_topic_, std::string("imu"));
+  nh_private.param("use_request", use_request_, true);
+  nh_private.param("output_freq", output_freq_, 50);
+  nh_private.param("correction_file_addr", correction_file_addr_,
+                   std::string(""));
+
+  YAML::Node correction = YAML::LoadFile(correction_file_addr_);
+  for (size_t i = 0; i < 3; i++) {
+    gyro_cov_(i) = correction["gyro_cov"][i].as<double>();
+    angular_velo_cov_(i) = correction["angular_velo_cov"][i].as<double>();
+    acc_cov_(i) = correction["acc_cov"][i].as<double>();
+
+    acc_calibrator_.bias_(i) = correction["acc_bias"][i].as<double>();
+    gyro_calibrator_.bias_(i) = correction["gyro_bias"][i].as<double>();
   }
-  if (!nh_private.getParam("baud_rate", baud_rate)) {
-    baud_rate = 115200;
+
+  for (size_t i = 0; i < 9; i++) {
+    acc_calibrator_.misalignment_(i) =
+        correction["acc_misalign"][i].as<double>();
+    gyro_calibrator_.misalignment_(i) =
+        correction["gyro_misalign"][i].as<double>();
+    acc_calibrator_.scale_(i) = correction["acc_scale"][i].as<double>();
+    gyro_calibrator_.scale_(i) = correction["gyro_scale"][i].as<double>();
   }
-  if (!nh_private.getParam("imu_frame_id", imu_frame_id)) {
-    imu_frame_id = "base_imu";
-  }
-  if (!nh_private.getParam("imu_pub_topic", imu_pub_topic)) {
-    imu_pub_topic = "imu";
-  }
-  if (!nh_private.getParam("use_request", use_request)) {
-    use_request = true;
-  }
-  if (!nh_private.getParam("output_freq", output_freq)) {
-    output_freq = 50;
-  }
-  if (!nh_private.getParam("use_debug", use_debug)) {
-    use_debug = false;
+
+  Eigen::Matrix3d mat_tmp;
+  acc_calibrator_.misalignment_.isZero()
+      ? acc_calibrator_.misalignment_.setIdentity()
+      : mat_tmp;
+  acc_calibrator_.scale_.isZero() ? acc_calibrator_.scale_.setIdentity()
+                                  : mat_tmp;
+  gyro_calibrator_.misalignment_.isZero()
+      ? gyro_calibrator_.misalignment_.setIdentity()
+      : mat_tmp;
+  gyro_calibrator_.scale_.isZero() ? gyro_calibrator_.scale_.setIdentity()
+                                   : mat_tmp;
+
+}
+
+void ImuReader::readLoop() {
+  ros::Rate rate(output_freq_);
+  while (ros::ok()) {
+    if (use_request_) {
+      imu_ser_.write(cmd_.ASK_FOR_DATA, sizeof(cmd_.ASK_FOR_DATA));
+      ros::Duration(0.005).sleep();
+
+      readData();
+    } else {
+      readData();
+    }
+
+    rate.sleep();
   }
 }
 
-void ImuReader::ReadDataCallback(const ros::TimerEvent&) {
-  if (use_request) {
-    imu_ser.write(cmd.ASK_FOR_DATA, sizeof(cmd.ASK_FOR_DATA));
-    // std::cout << "============" << std::endl;
-    // std::cout << "cmd data : " << std::endl;
-    // for (size_t i = 0; i < sizeof(cmd.ASK_FOR_DATA); i++) {
-    //   std::cout << std::hex << "0x" << (int)cmd.ASK_FOR_DATA[i] << "  ";
-    // }
-    // std::cout << "============" << std::endl;
-    // std::cout << std::endl;
+void ImuReader::readData() {
+  std::vector<uint8_t> imu_data;
+  std::vector<uint8_t> imu_data_tmp;
 
-    ros::Duration(0.01).sleep();
+  if (validDataHeader()) {
+    uint8_t* data_len = new uint8_t;
 
-    std::vector<uint8_t> imu_data;
-    std::vector<uint8_t> empty_data;
-    if (imu_ser.available()) {
-      imu_data.clear();
-      imu_ser.read(imu_data, 32);
+    imu_ser_.read(data_len, 1);
+    imu_ser_.read(imu_data_tmp, data_len[0] - (uint8_t)1);
 
-      // std::cout << "============" << std::endl;
-      // std::cout << "imu data : " << std::endl;
-      // for (size_t i = 0; i < imu_data.size(); i++) {
-      //   std::cout << std::hex << "0x" << (int)imu_data[i] << "  ";
-      // }
-      // std::cout << "============" << std::endl;
-      // std::cout << std::endl;
+    imu_data.push_back(DATA_HEADER);
+    imu_data.push_back(data_len[0]);
 
-      imu_ser.read(empty_data, imu_ser.available());
-      DataParser(imu_data);
+    for (size_t i = 0; i < imu_data_tmp.size(); i++) {
+      imu_data.push_back(imu_data_tmp[i]);
     }
+    parseData(imu_data);
+    delete data_len;
   } else {
-    std::vector<uint8_t> imu_data;
-    std::vector<uint8_t> imu_data_tmp;
-    while (true) {
-      if (imu_ser.available() < 32) {
-        ROS_WARN("data in buffer is : %d which is not enough",
-                 (int)imu_ser.available());
-        break;
-      }
-      imu_ser.read(imu_data_tmp, 1);
-      if (0x68 == imu_data_tmp[0]) {
-        imu_data_tmp.clear();
-        imu_ser.read(imu_data_tmp, 1);
-        if (0x1f == imu_data_tmp[0]) {
-          imu_data_tmp.clear();
-          imu_ser.read(imu_data_tmp, 30);
-          imu_data.push_back(0x68);
-          imu_data.push_back(0x1f);
-          // imu_data.push_back(0x00);
-          // imu_data.push_back(0x84);
-          for (size_t i = 0; i < imu_data_tmp.size(); i++) {
-            imu_data.push_back(imu_data_tmp[i]);
-          }
-
-          imu_ser.flushInput();
-          DataParser(imu_data);
-          break;
-        }
-      } else {
-        imu_data_tmp.clear();
-      }
-    }
-
-    /*
-    std::cout << "==========================" << std::endl;
-    std::cout << "raw hex i got is : ";
-    for (size_t i = 0; i < imu_data.size(); i++) {
-      std::cout << std::hex << "0x" << (int)imu_data[i] << "  ";
-    }
-    std::cout << std::endl;
-    */
+    ROS_WARN("spend too much time to find data header");
   }
 }
 
-void ImuReader::DataParser(const std::vector<uint8_t>& data) {
-  // vec = {roll/pitch/yaw, acc_x/_y/_z, angular_vx/_vy/_vz}
-  Eigen::VectorXd vec(9);
-  if (data.size() == 32) {
-    vec(0) = (double)Converter(data[4], data[5], data[6]) / 100.0;
-    vec(1) = (double)Converter(data[7], data[8], data[9]) / 100.0;
-    vec(2) = (double)Converter(data[10], data[11], data[12]) / 100.0;
+void ImuReader::parseData(const std::vector<uint8_t>& data) {
+  if (!validCheckSum(data)) {
+    ROS_WARN("Incorrect check sum");
+    return;
+  }
 
-    if (use_debug) {
-      ROS_INFO("euler angle in degree : %.2f, %.2f, %.2f", vec(0), vec(1),
-               vec(2));
-    }
+  if (data.size() == 32) {
+    Eigen::VectorXd vec(9);
+    Eigen::Vector3d gyro_vec, angular_velo_vec, acc_vec;
+
+    gyro_vec(0) = (double)convert(data[4], data[5], data[6]) / 100.0;
+    gyro_vec(1) = (double)convert(data[7], data[8], data[9]) / 100.0;
+    gyro_vec(2) = (double)convert(data[10], data[11], data[12]) / 100.0;
+    // get orientation in quaternion form
+    gyro_vec = gyro_vec / 180.0 * M_PI;
 
     // attention : computing acceleration should divide 1000
-    vec(3) = (double)Converter(data[13], data[14], data[15]) / 1000.0;
-    vec(4) = (double)Converter(data[16], data[17], data[18]) / 1000.0;
-    vec(5) = (double)Converter(data[19], data[20], data[21]) / 1000.0;
+    acc_vec(0) = (double)convert(data[13], data[14], data[15]) / 1000.0;
+    acc_vec(1) = (double)convert(data[16], data[17], data[18]) / 1000.0;
+    acc_vec(2) = (double)convert(data[19], data[20], data[21]) / 1000.0;
 
-    vec(6) = (double)Converter(data[22], data[23], data[24]) / 100.0;
-    vec(7) = (double)Converter(data[25], data[26], data[27]) / 100.0;
-    vec(8) = (double)Converter(data[28], data[29], data[30]) / 100.0;
+    angular_velo_vec(0) = (double)convert(data[22], data[23], data[24]) / 100.0;
+    angular_velo_vec(1) = (double)convert(data[25], data[26], data[27]) / 100.0;
+    angular_velo_vec(2) = (double)convert(data[28], data[29], data[30]) / 100.0;
+    angular_velo_vec = angular_velo_vec / 180.0 * M_PI;
 
     sensor_msgs::Imu imu_msg;
-    imu_msg.header.frame_id = imu_frame_id;
+    imu_msg.header.frame_id = imu_frame_;
     imu_msg.header.stamp = ros::Time::now();
 
-    // get orientation in quaternion form
-    vec(0) = vec(0) / 180.0 * M_PI;
-    vec(1) = vec(1) / 180.0 * M_PI;
-    vec(2) = vec(2) / 180.0 * M_PI;
-    Eigen::Quaterniond q = Eigen::AngleAxisd(vec(0), Eigen::Vector3d::UnitX()) *
-                           Eigen::AngleAxisd(vec(1), Eigen::Vector3d::UnitY()) *
-                           Eigen::AngleAxisd(vec(2), Eigen::Vector3d::UnitZ());
-    imu_msg.orientation.x = q.x();
-    imu_msg.orientation.y = q.y();
-    imu_msg.orientation.z = q.z();
-    imu_msg.orientation.w = q.w();
-    // imu_msg.orientation_covariance = {1e6, 0, 0, 0, 1e6, 0, 0, 0, 1e-6};
-    imu_msg.orientation_covariance = {2e-8, 0, 0, 0, 2e-8, 0, 0, 0, 1.3e-7};
+    calibrate(gyro_vec, gyro_calibrator_);
+    imu_msg.orientation = tf::createQuaternionMsgFromRollPitchYaw(
+        gyro_vec(0), gyro_vec(1), gyro_vec(2));
+    // imu_msg.orientation_covariance = {2e-8, 0, 0, 0, 2e-8, 0, 0, 0, 1.3e-7};
+    imu_msg.orientation_covariance = {
+        gyro_cov_(0), 0, 0, 0, gyro_cov_(1), 0, 0, 0, gyro_cov_(2)};
 
     // get angular velocity
-    imu_msg.angular_velocity.x = vec(6) / 180.0 * M_PI;
-    imu_msg.angular_velocity.y = vec(7) / 180.0 * M_PI;
-    imu_msg.angular_velocity.z = vec(8) / 180.0 * M_PI;
-    imu_msg.angular_velocity_covariance = {5e-7, 0, 0, 0,     5e-7,
-                                           0,    0, 0, 1.3e-7};
+    imu_msg.angular_velocity.x = angular_velo_vec(0);
+    imu_msg.angular_velocity.y = angular_velo_vec(1);
+    imu_msg.angular_velocity.z = angular_velo_vec(2);
+
+    // imu_msg.angular_velocity_covariance = {5e-7, 0, 0, 0,     5e-7,
+    //                                        0,    0, 0, 1.3e-7};
+    imu_msg.angular_velocity_covariance = {angular_velo_cov_(0), 0, 0, 0,
+                                           angular_velo_cov_(1), 0, 0, 0,
+                                           angular_velo_cov_(2)};
 
     // get linear acceleration (value * g)
-    imu_msg.linear_acceleration.x = vec(3) * GRAVITY;
-    imu_msg.linear_acceleration.y = vec(4) * GRAVITY;
-    imu_msg.linear_acceleration.z = vec(5) * GRAVITY;
-    imu_msg.linear_acceleration_covariance = {3.511e-5, 0, 0, 0,       3.339e-5,
-                                              0,        0, 0, 3.989e-5};
+    calibrate(acc_vec, acc_calibrator_);
+    imu_msg.linear_acceleration.x = acc_vec(0) * GRAVITY;
+    imu_msg.linear_acceleration.y = acc_vec(1) * GRAVITY;
+    imu_msg.linear_acceleration.z = acc_vec(2) * GRAVITY;
 
-    imu_pub.publish(imu_msg);
+    // imu_msg.linear_acceleration_covariance = {3.511e-5, 0, 0,
+    // 0,       3.339e-5,
+    //                                           0,        0, 0, 3.989e-5};
+    imu_msg.linear_acceleration_covariance = {
+        acc_cov_(0), 0, 0, 0, acc_cov_(1), 0, 0, 0, acc_cov_(2)};
+
+    imu_pub_.publish(imu_msg);
   } else {
     ROS_WARN("imu data size = %d is not correct", (int)data.size());
   }
 }
 
-int ImuReader::Converter(const uint8_t a, const uint8_t b, const uint8_t c) {
+int ImuReader::convert(const uint8_t& a, const uint8_t& b, const uint8_t& c) {
   std::stringstream int2str, str2int;
   int2str << (int)a % 16 << (int)b / 16 << (int)b % 16 << (int)c / 16
           << (int)c % 16;
@@ -309,3 +263,41 @@ int ImuReader::Converter(const uint8_t a, const uint8_t b, const uint8_t c) {
 
   return int_result;
 }
+
+bool ImuReader::validDataHeader() {
+  std::vector<uint8_t> imu_one_byte;
+
+  ros::Time start = ros::Time::now();
+  while (true) {
+    imu_one_byte.clear();
+    imu_ser_.read(imu_one_byte, 1);
+
+    if (DATA_HEADER == imu_one_byte[0]) {
+      return true;
+    }
+
+    if ((ros::Time::now() - start).toSec() > 1.0 / output_freq_) {
+      return false;
+    }
+  }
+}
+
+bool ImuReader::validCheckSum(const std::vector<uint8_t>& data) {
+  int check_sum = 0;
+  for (size_t i = 1; i < data.size() - 1; i++) {
+    check_sum += data[i];
+  }
+
+  if ((check_sum & 0xff) == data.back()) {
+    return true;
+  } else {
+    ROS_WARN("The check sum is incorrect");
+  }
+}
+
+void ImuReader::calibrate(Eigen::Vector3d& data, const Calibrator& calibrator) {
+  data =
+      calibrator.misalignment_ * calibrator.scale_ * (data - calibrator.bias_);
+}
+
+}  // namespace mobile_base

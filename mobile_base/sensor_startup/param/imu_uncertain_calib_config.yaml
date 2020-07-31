@@ -1,0 +1,11 @@
+gyro_cov: [2.0e-8, 2.0e-8, 1.3e-7]
+angular_velo_cov: [5.0e-7, 5.0e-7, 1.3e-7]
+acc_cov: [3.5e-5, 3.3e-5, 3.989e-5]
+
+acc_misalign: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+acc_scale: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+acc_bias: [0, 0, 0]
+
+gyro_misalign: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+gyro_scale: [1, 0, 0, 0, 1, 0, 0, 0, 1]
+gyro_bias: [0, 0, 0]
