@@ -1,4 +1,15 @@
 # Update
+
+## 2020.08.01
+- 增加velodyne插件
+- 增加pointcloud转pcd
+- 增加pointcloud拼接
+```
+roslaunch paintingrobot_description bringup_gazebo.launch
+roslaunch paintingrobot_description display_pointcloud.launch
+```
+
+
 ## 2020.04.06
 - 增加ORB SLAM2建图``roslaunch paintingrobot_slam paintingrobot_orbslam2.launch``
 - 增加Cartographer建图`` roslaunch paintingrobot_slam paintingrobot_cartographer.launch``

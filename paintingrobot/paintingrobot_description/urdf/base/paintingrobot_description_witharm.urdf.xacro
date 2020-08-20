@@ -3,14 +3,14 @@
 
   <!-- PROPERTY LIST -->
     <xacro:property name="M_PI" value="3.1415926"/>
-	
-	
+
+
  <!-- Macro for inertia matrix -->
     <xacro:macro name="sphere_inertial_matrix" params="m r">
         <inertial>
             <mass value="${m}" />
             <inertia ixx="${2*m*r*r/5}" ixy="0" ixz="0"
-                iyy="${2*m*r*r/5}" iyz="0" 
+                iyy="${2*m*r*r/5}" iyz="0"
                 izz="${2*m*r*r/5}" />
         </inertial>
     </xacro:macro>
@@ -20,9 +20,9 @@
             <mass value="${m}" />
             <inertia ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0"
                 iyy="${m*(3*r*r+h*h)/12}" iyz = "0"
-                izz="${m*r*r/2}" /> 
+                izz="${m*r*r/2}" />
         </inertial>
-    </xacro:macro> 
+    </xacro:macro>
 
     <xacro:macro name="cuboid_inertial" params="length weight hight mass *origin">
       <inertial>
@@ -35,7 +35,7 @@
     </xacro:macro>
 
  <!-- robot -->
-<xacro:macro name="paintingrobot" params="prefix:=paintingrobot">	
+<xacro:macro name="paintingrobot" params="prefix:=paintingrobot">
 
   <link
     name="base_link">
@@ -698,7 +698,7 @@
         <rpyOffsets>0 0 0</rpyOffsets>
       </plugin>
     </gazebo>
-    
+
     <gazebo reference="base_footprint">
       <turnGravityOff>true</turnGravityOff>
     </gazebo>
@@ -750,15 +750,7 @@
     <gazebo reference="zed_frame_optical">
       <turnGravityOff>true</turnGravityOff>
     </gazebo>
-    <gazebo reference="kinect_link">
-      <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-    <gazebo reference="kinect_frame_optical">
-      <turnGravityOff>true</turnGravityOff>
-    </gazebo>
-    <gazebo reference="laser_link">
-      <turnGravityOff>true</turnGravityOff>
-    </gazebo>
+
 
 </xacro:macro>
 </robot>

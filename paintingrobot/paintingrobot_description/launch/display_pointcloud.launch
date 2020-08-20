@@ -1,0 +1,8 @@
+<launch>
+<!--本文件用于rviz显示点云-->
+  <node
+    name="rviz"
+    pkg="rviz"
+    type="rviz"
+    args="-d $(find paintingrobot_description)/config/pointcloud.rviz" />
+</launch>

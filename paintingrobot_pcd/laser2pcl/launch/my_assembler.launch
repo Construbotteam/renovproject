@@ -1,0 +1,9 @@
+<launch>
+  <node type="point_cloud2_assembler" pkg="laser_assembler" name="pointcloud_assembler">
+    <remap from="cloud" to="/velodyne_points"/>
+    <param name="max_clouds" type="int" value="400" />
+    <param name="fixed_frame" type="string" value="odom" />
+    <param name="tf_cache_time_secs" type="double" value="10.0" />
+  </node>
+  <node type ="laser2pcl.py" pkg="laser2pcl" name="laser2pcl" output="screen"/>
+</launch>

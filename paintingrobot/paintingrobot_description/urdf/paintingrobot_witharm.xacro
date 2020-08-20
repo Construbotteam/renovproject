@@ -3,9 +3,9 @@
 
     <xacro:include filename="$(find paintingrobot_description)/urdf/base/paintingrobot_description_witharm.urdf.xacro" />
 <!--include sensors-->
-    <xacro:include filename="$(find paintingrobot_description)/urdf/sensors/kinect_gazebo.xacro" />
-    <xacro:include filename="$(find paintingrobot_description)/urdf/sensors/lidar_gazebo.xacro" />
-    <xacro:include filename="$(find paintingrobot_description)/urdf/sensors/camera_gazebo.xacro" />
+    <!-- <xacro:include filename="$(find paintingrobot_description)/urdf/sensors/kinect_gazebo.xacro" /> -->
+    <!-- <xacro:include filename="$(find paintingrobot_description)/urdf/sensors/lidar_gazebo.xacro" /> -->
+    <!-- <xacro:include filename="$(find paintingrobot_description)/urdf/sensors/camera_gazebo.xacro" /> -->
     <xacro:include filename="$(find paintingrobot_description)/urdf/sensors/zed.xacro" />
 
 <!--load xianquzhe base-->
@@ -19,22 +19,22 @@
     </joint>
 
 <!--load kinect-->
-<xacro:kinect_camera prefix="kinect"  />
+<!-- <xacro:kinect_camera prefix="kinect"  />
 
   <joint name="kinect_joint" type="fixed">
     <parent link= "rodclimbing_link2"/>
     <child link = "kinect_link" />
     <origin xyz="0.1 0.0 0.35" rpy="0 0 0.0" />
-  </joint>
+  </joint> -->
 
 <!--load lidar-->
-<xacro:rplidar prefix="laser"  />
+<!-- <xacro:rplidar prefix="laser"  />
 
   <joint name="laser_joint" type="fixed">
     <parent link= "mobilebase_link"/>
     <child link = "laser_link" />
     <origin xyz="0.055 0.0 0.95" rpy="0.0 0.0 0.0" />
-  </joint>
+  </joint> -->
 
 <!--load zed-->
 <xacro:zed prefix="zed"  />
@@ -44,5 +44,35 @@
     <child link = "zed_camera_center" />
     <origin xyz="0.0 0.0 0.0" rpy="0.0 ${-M_PI/2} ${-M_PI/2}" />
   </joint>
+
+<!--load vlp_16-->
+  <!-- Parameters
+  *origin   URDF transform from parent link.
+  parent  URDF parent link name. Default base_link
+  name  URDF model name. Also used as tf frame_id for PointCloud2 output. Default velodyne
+  topic   PointCloud2 output topic name. Default /velodyne_points
+  hz Update   rate in hz. Default 10
+  lasers  Number of vertical spinning lasers. Default VLP-16: 16, HDL-32E: 32
+  samples Nuber of horizontal rotating samples. Default VLP-16: 1875, HDL-32E: 2187
+  min_range Minimum range value in meters. Default 0.9
+  max_range Maximum range value in meters. Default 130.0
+  noise Gausian noise value in meters. Default 0.008
+  min_angle Minimum horizontal angle in radians. Default -3.14
+  max_angle Maximum horizontal angle in radians. Default 3.14
+  gpu Use gpu_ray sensor instead of the standard ray sensor. Default false
+  min_intensity The minimum intensity beneath which returns will be clipped. Can be used to remove low-intensity objects.
+  -->
+<xacro:include filename="$(find paintingrobot_description)/urdf/sensors/VLP-16.urdf.xacro"/>
+  <VLP-16
+    parent="rodclimbing_link2"
+    hz="1"
+    lasers="64"
+    samples="2000"
+    min_range="0.9"
+    max_range="130.0"
+    min_angle="-${M_PI}"
+    max_angle="${M_PI}" >
+    <origin xyz="0.2 0 0.3" rpy="0 0 ${M_PI/2}" />
+  </VLP-16>
 
 </robot>
