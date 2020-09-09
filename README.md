@@ -1,5 +1,14 @@
 # Update
 
+## 2020.09.09
+
+- 增加rtab-map建图
+- 增加合并RGBD相机模拟全站仪功能
+- 增加octomap功能
+
+> 实验命令见paintingrobot_pcdmap文件夹下的**实验命令.md**
+
+
 ## 2020.08.01
 - 增加velodyne插件
 - 增加pointcloud转pcd

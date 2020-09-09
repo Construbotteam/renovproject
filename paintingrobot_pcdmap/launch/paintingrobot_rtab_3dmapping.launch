@@ -1,0 +1,82 @@
+<launch>
+  <!-- Choose visualization -->
+  <arg name="rviz" default="false" />
+  <arg name="rtabmapviz" default="true" />
+
+  <!-- Localization-only mode -->
+  <arg name="localization" default="false"/>
+
+  <!-- Corresponding config files -->
+  <arg name="rtabmapviz_cfg" default="~/.ros/rtabmap_gui.ini" />
+  <arg name="rviz_cfg" default="$(find rtabmap_ros)/launch/config/rgbd.rviz" />
+  
+  <!-- 设置机器人的底座link -->
+  <arg name="frame_id" default="base_link"/>
+  <!-- Fixed frame id, you may set "base_link" or "base_footprint" if they are published -->
+  <arg name="database_path"/>
+  <!-- 每次建图时，为避免覆盖，设置成launch的时候手动指定路径 database_path:=~/test.db -->
+  <arg name="rtabmap_args" default=""/>
+  <arg name="launch_prefix" default=""/>
+  <!-- for debugging purpose, it fills launch-prefix tag of the nodes -->
+  <arg name="approx_sync" default="true"/>
+  <!-- if timestamps of the input topics are not synchronized -->
+
+  <!-- 设置rgbd相机topic -->
+  <arg name="rgb_topic" default="/kinect_1/rgb/image_raw" />
+  <arg name="depth_registered_topic" default="/kinect_1/depth/image_raw" />
+  <arg name="camera_info_topic" default="/kinect_1/rgb/camera_info" />
+  <arg name="compressed" default="false"/>
+
+  <!-- 二维激光雷达 -->
+  <arg name="subscribe_scan" default="true"/>
+  <!-- Assuming 2D scan if set, rtabmap will do 3DoF mapping instead of 6DoF -->
+  <arg name="scan_topic" default="/scan"/>
+
+  <!-- 三维激光雷达 -->
+  <arg name="subscribe_scan_cloud" default="false"/>
+  <!-- Assuming 3D scan if set -->
+  <arg name="scan_cloud_topic" default="/scan_cloud"/>
+
+  <!-- 没有odom的话可以使用视觉里程计 -->
+  <arg name="visual_odometry" default="false"/>
+  <!-- Generate visual odometry -->
+  <arg name="odom_topic" default="/odom"/>
+  <!-- Odometry topic used if visual_odometry is false -->
+  <arg name="odom_frame_id" default=""/>
+  <!-- If set, TF is used to get odometry instead of the topic -->
+
+  <arg name="namespace" default="rtabmap"/>
+  <arg name="wait_for_transform" default="0.2"/>
+
+  <include file="$(find rtabmap_ros)/launch/rtabmap.launch">
+    <arg name="rtabmapviz" value="$(arg rtabmapviz)" />
+    <arg name="rviz" value="$(arg rviz)" />
+    <arg name="localization" value="$(arg localization)"/>
+    <arg name="gui_cfg" value="$(arg rtabmapviz_cfg)" />
+    <arg name="rviz_cfg" value="$(arg rviz_cfg)" />
+
+    <arg name="frame_id" value="$(arg frame_id)"/>
+    <arg name="namespace" value="$(arg namespace)"/>
+    <arg name="database_path" value="$(arg database_path)"/>
+    <arg name="wait_for_transform" value="$(arg wait_for_transform)"/>
+    <arg name="rtabmap_args" value="$(arg rtabmap_args)"/>
+    <arg name="launch_prefix" value="$(arg launch_prefix)"/>
+    <arg name="approx_sync" value="$(arg approx_sync)"/>
+
+    <arg name="rgb_topic" value="$(arg rgb_topic)" />
+    <arg name="depth_topic" value="$(arg depth_registered_topic)" />
+    <arg name="camera_info_topic" value="$(arg camera_info_topic)" />
+    <arg name="compressed" value="$(arg compressed)"/>
+
+    <arg name="subscribe_scan" value="$(arg subscribe_scan)"/>
+    <arg name="scan_topic" value="$(arg scan_topic)"/>
+
+    <arg name="subscribe_scan_cloud" value="$(arg subscribe_scan_cloud)"/>
+    <arg name="scan_cloud_topic" value="$(arg scan_cloud_topic)"/>
+
+    <arg name="visual_odometry" value="$(arg visual_odometry)"/>
+    <arg name="odom_topic" value="$(arg odom_topic)"/>
+    <arg name="odom_frame_id" value="$(arg odom_frame_id)"/>
+    <arg name="odom_args" value="$(arg rtabmap_args)"/>
+  </include>
+</launch>

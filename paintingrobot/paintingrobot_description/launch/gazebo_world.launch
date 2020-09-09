@@ -1,8 +1,8 @@
 <launch>
 
   <!-- 设置gazebo环境参数 -->
-
-  <arg name="world_name" value="$(find paintingrobot_description)/worlds/room_high5.world"/>
+  <!-- <arg name="world_name" value="$(find paintingrobot_description)/worlds/room_high5.world"/> -->
+  <arg name="world_name" value="$(find paintingrobot_description)/worlds/ROS-Academy.world"/>
   <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
   <arg name="gui" default="true"/>
@@ -23,7 +23,6 @@
   <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find paintingrobot_description)/urdf/paintingrobot_witharm.xacro'" />
 
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
-	args="-urdf -model paintingrobot -param robot_description"/>
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model paintingrobot -param robot_description"/>
 
 </launch>
