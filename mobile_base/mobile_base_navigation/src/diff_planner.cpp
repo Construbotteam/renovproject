@@ -426,9 +426,23 @@ void DiffPlanner::brake(geometry_msgs::Twist& twist) {
 void DiffPlanner::moveWithLimit(geometry_msgs::Twist& cmd_vel) {
   double dt = 1.0 / control_freq_;
 
-  double acc_linear, acc_angular;
+  geometry_msgs::Twist cmd_vel_mirror;
+  cmd_vel_mirror.angular.z = angles::normalize_angle(cmd_vel.angular.z + M_PI);
+  cmd_vel_mirror.linear.x = -cmd_vel.linear.x;
+
+  double acc_linear, acc_angular, acc_angular_mirror;
+//  acc_angular_mirror = (cmd_vel_mirror.angular.z - pre_cmd_.angular.z) / dt;
+//  acc_angular = (cmd_vel.angular.z - pre_cmd_.angular.z) / dt;
+  acc_angular_mirror = angles::shortest_angular_distance(pre_cmd_.angular.z, cmd_vel_mirror.angular.z) / dt;
+  acc_angular = angles::shortest_angular_distance(pre_cmd_.angular.z, cmd_vel.angular.z) / dt;
+  /*
+  if (fabs(acc_angular) > fabs(acc_angular_mirror)) {
+    acc_angular = acc_angular_mirror;
+    cmd_vel = cmd_vel_mirror;
+  }
+  */
+
   acc_linear = (cmd_vel.linear.x - pre_cmd_.linear.x) / dt;
-  acc_angular = (cmd_vel.angular.z - pre_cmd_.angular.z) / dt;
 
   /*
   Attention here!!
