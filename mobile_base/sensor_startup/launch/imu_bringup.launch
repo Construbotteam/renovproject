@@ -3,7 +3,7 @@
   <arg name="freq" default="5" />
   <param name="imu_publish_rate" value="50"/>
   <node pkg="sensor_startup" type="imu_reader_node" name="imu_reader" output="screen">
-    <param name="port_id" value="/dev/ttyUSB0" />
+    <param name="port_id" value="/dev/ttyUSB1" />
     <param name="baud_rate" value="115200" />
     <param name="imu_frame_id" value="imu_link"/>
     <param name="imu_pub_topic" value="imu"/>

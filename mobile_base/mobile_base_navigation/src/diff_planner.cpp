@@ -171,6 +171,7 @@ bool DiffPlanner::computeVelocityCommands(geometry_msgs::Twist& cmd_vel) {
   if (rotate_to_first_pose_) {
     // ROS_INFO("run first rot");
     double first_rot_goal_yaw = tf::getYaw(original_plan_[0].pose.orientation);
+    //double first_rot_goal_yaw = tf::getYaw(original_plan_.back().pose.orientation);
     double first_rot_cur_yaw = tf::getYaw(global_pose.pose.orientation);
     double first_rot_yaw_diff = angles::shortest_angular_distance(
         first_rot_cur_yaw, first_rot_goal_yaw);
@@ -445,9 +446,11 @@ void DiffPlanner::moveWithLimit(geometry_msgs::Twist& cmd_vel) {
             ? std::min(cmd_vel.angular.z, pure_rotation_max_theta_v_)
             : std::max(cmd_vel.angular.z, -pure_rotation_max_theta_v_);
   } else if (move_state_ == MoveForward) {
+  /*
     cmd_vel.angular.z = cmd_vel.angular.z > 0
                             ? std::min(cmd_vel.angular.z, M_PI / 2)
                             : std::max(cmd_vel.angular.z, -M_PI / 2);
+			    */
   }
 
   // the acceleration limit

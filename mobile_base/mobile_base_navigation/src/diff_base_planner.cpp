@@ -244,7 +244,7 @@ void MobileBasePlannerROS::PlanCallback(const ros::TimerEvent&) {
       double steer_angle = angles::shortest_angular_distance(
           tf::getYaw(start.pose.orientation),
           tf::getYaw(new_path[0].pose.orientation));
-      if (fabs(steer_angle) < M_PI_2 && path_length < 0.55) {
+      if (fabs(steer_angle) < M_PI_2 + 0.1 && path_length < 0.50) {
         ROS_INFO("steer angle : %.3f", steer_angle);
         sensor_msgs::JointState js_msg;
 	js_msg.header.frame_id = "wheel";

@@ -1,0 +1,6 @@
+image: ./futian_lab_map2.tif
+resolution: 0.015625
+origin: [-8.000000, -4.000000, 0.000000]
+negate: 0
+occupied_thresh: 0.1
+free_thresh: 0.196

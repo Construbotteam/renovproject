@@ -1,4 +1,4 @@
-# The guide for mobile base operation
+# The guide for mobile base operation in BIM-based localization
 
 ## 1 SLAM
 ### 1.1 Start the sensors
@@ -26,7 +26,7 @@ C) Static transformation of sensor external parameters
 $ roslaunch mobile_base_description static_transformation.launch
 ```
 
-### 1.2 Apply SLAM
+### 1.2 Provide Odometry
 Source the setup.bash
 ```terminal
 $ source <absolute-path-of-the-setup-bash-file-of-cartographer-ros>
@@ -39,26 +39,13 @@ Start SLAM
 ```terminal
 $ roslaunch cartographer_ros cartographer_demo_rplidar.launch
 ```
-Save the map with name \<file-name\>
-```terminal
-$ rosservice call /finish_trajectory 0
-$ rosservice call /write_state "filename: '<path>/<file-name>.pbstream'"
-```
-
-### 1.3 Apply localization
-Start pure-localization node 
-(remember to modify the path of pbstream file in this launch file with new name first)
-```terminal
-$ roslaunch cartographer_ros cartographer_demo_rplidar_localization_sick571.launch
-```
-Control the base manually to get the correct pose before launching the navigation node 
-
-<font color='red'>Attention: press the key once each time, never hold on !!! </font>
 
 ## 2 Motor 
 Startup the driver
 ```terminal
 $ roslaunch sensor_startup kinco_motor_bringup.launch
+
+
 ```
 Start the tele-operation node
 ```terminal
@@ -69,7 +56,17 @@ Disable the motor drivers and switch off CAN-Analyst
 $ rosrun sensor_startup stop_motor
 ```
 
-## 3 Navigation
+## 3 Provide a static map
 ```terminal
-$ roslaunch mobile_base_navigation diff_base_navigation.launch
+$ rosrun map_server map_server futian_lab_map2.yaml
+```
+
+## 4 Run amcl
+```terminal
+$ roslaunch mobile_base_slam amcl.launch
+```
+
+## 5 Run planner
+```terminal
+roslaunch mobile_base_navigation diff_base_planner.launch
 ```
