@@ -171,7 +171,8 @@ bool DiffPlanner::computeVelocityCommands(geometry_msgs::Twist& cmd_vel) {
   if (rotate_to_first_pose_) {
     // ROS_INFO("run first rot");
     double first_rot_goal_yaw = tf::getYaw(original_plan_[0].pose.orientation);
-    //double first_rot_goal_yaw = tf::getYaw(original_plan_.back().pose.orientation);
+    // double first_rot_goal_yaw =
+    // tf::getYaw(original_plan_.back().pose.orientation);
     double first_rot_cur_yaw = tf::getYaw(global_pose.pose.orientation);
     double first_rot_yaw_diff = angles::shortest_angular_distance(
         first_rot_cur_yaw, first_rot_goal_yaw);
@@ -285,6 +286,23 @@ void DiffPlanner::moveToGoalPid(const geometry_msgs::PoseStamped& global_pose,
   turning_angle = sign(turning_angle) * std::min(fabs(turning_angle), M_PI / 2);
 
   cmd_vel.angular.z = turning_angle;
+  /***/
+  if (move_state_ == MoveForward) {
+    geometry_msgs::Twist cmd_vel_mirror;
+    cmd_vel_mirror.angular.z =
+        angles::normalize_angle(cmd_vel.angular.z + M_PI);
+    cmd_vel_mirror.linear.x = -cmd_vel.linear.x;
+
+    double acc_angular, acc_angular_mirror;
+    acc_angular_mirror = angles::shortest_angular_distance(
+        pre_cmd_.angular.z, cmd_vel_mirror.angular.z);
+    acc_angular = angles::shortest_angular_distance(pre_cmd_.angular.z,
+                                                    cmd_vel.angular.z);
+    if (fabs(acc_angular) > fabs(acc_angular_mirror)) {
+      cmd_vel = cmd_vel_mirror;
+    }
+  }
+  /***/
 
   // compute theta velocity
   // theta velocity = pid(y_err)
@@ -431,10 +449,14 @@ void DiffPlanner::moveWithLimit(geometry_msgs::Twist& cmd_vel) {
   cmd_vel_mirror.linear.x = -cmd_vel.linear.x;
 
   double acc_linear, acc_angular, acc_angular_mirror;
-//  acc_angular_mirror = (cmd_vel_mirror.angular.z - pre_cmd_.angular.z) / dt;
-//  acc_angular = (cmd_vel.angular.z - pre_cmd_.angular.z) / dt;
-  acc_angular_mirror = angles::shortest_angular_distance(pre_cmd_.angular.z, cmd_vel_mirror.angular.z) / dt;
-  acc_angular = angles::shortest_angular_distance(pre_cmd_.angular.z, cmd_vel.angular.z) / dt;
+  //  acc_angular_mirror = (cmd_vel_mirror.angular.z - pre_cmd_.angular.z) / dt;
+  //  acc_angular = (cmd_vel.angular.z - pre_cmd_.angular.z) / dt;
+  acc_angular_mirror = angles::shortest_angular_distance(
+                           pre_cmd_.angular.z, cmd_vel_mirror.angular.z) /
+                       dt;
+  acc_angular =
+      angles::shortest_angular_distance(pre_cmd_.angular.z, cmd_vel.angular.z) /
+      dt;
   /*
   if (fabs(acc_angular) > fabs(acc_angular_mirror)) {
     acc_angular = acc_angular_mirror;
@@ -460,11 +482,11 @@ void DiffPlanner::moveWithLimit(geometry_msgs::Twist& cmd_vel) {
             ? std::min(cmd_vel.angular.z, pure_rotation_max_theta_v_)
             : std::max(cmd_vel.angular.z, -pure_rotation_max_theta_v_);
   } else if (move_state_ == MoveForward) {
-  /*
-    cmd_vel.angular.z = cmd_vel.angular.z > 0
-                            ? std::min(cmd_vel.angular.z, M_PI / 2)
-                            : std::max(cmd_vel.angular.z, -M_PI / 2);
-			    */
+    /*
+      cmd_vel.angular.z = cmd_vel.angular.z > 0
+                              ? std::min(cmd_vel.angular.z, M_PI / 2)
+                              : std::max(cmd_vel.angular.z, -M_PI / 2);
+                              */
   }
 
   // the acceleration limit
