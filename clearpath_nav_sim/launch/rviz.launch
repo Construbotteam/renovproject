@@ -1,0 +1,3 @@
+<launch>
+    <node name="rviz_visualisation" pkg="rviz" type="rviz" output="log" args="-d $(find ridgeback_viz)/rviz/localization.rviz" />
+</launch>

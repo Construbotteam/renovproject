@@ -1,0 +1,17 @@
+> 使用ridgeback仿真器需要先安装
+sudo apt-get install ros-melodic-ridgeback-simulator ros-melodic-ridgeback-desktop
+
+全站仪扫描
+
+1. 启动clearpath仿真器
+roslaunch clearpath_nav_sim clearpath_gazebo.launch
+
+2. 合并点云,发布全站仪扫描数据到 /merged_cloud 话题
+rosrun clearpath_nav_sim merge_pointcloud_node
+
+3. 把点云话题转为PCD文件
+rosrun pcl_ros pointcloud_to_pcd input:=/merged_cloud
+*上面这条命令的教程http://wiki.ros.org/pcl_ros*
+
+4. 键盘控制
+/usr/bin/python src/clearpath_nav_sim/scripts/clearpath_teleop_key.py
