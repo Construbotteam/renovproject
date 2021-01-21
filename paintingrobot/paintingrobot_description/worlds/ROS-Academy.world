@@ -1,15 +1,15 @@
 <?xml version="1.0" ?>
 <sdf version="1.4">
-  <world name="default">
+ <world name="default">
     <scene>
       <ambient>0.68 0.68 0.68 1.0</ambient>
       <shadows> false</shadows>
-      <!-- <sky>
+      <sky>
         <sunrise/>
         <clouds>
           <speed>12</speed>
-        </clouds>
-      </sky> -->
+      </clouds>
+      </sky>
     </scene>
 
     <physics type='ode'>
@@ -32,7 +32,7 @@
       <pose>0 0 0 0 0 -1.57</pose>
     </include>
 
-    <include>
+    <!--<include>
       <uri>model://ISCAS_post</uri>
       <name>table1</name>
       <pose>8 3.5 0 0 0 1</pose>
@@ -41,7 +41,7 @@
       <uri>model://ISCAS_post</uri>
       <name>table2</name>
       <pose>6 5 0 0 0 1.57</pose>
-    </include>
+    </include>-->
 
   </world>
 </sdf>

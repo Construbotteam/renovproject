@@ -1,5 +1,10 @@
 # Update
 
+## 2020.10.30
+
+- 添加clearpath ridgeback仿真器
+- ridgeback的使用见clearpath_nav_sim中的**实验命令**
+
 ## 2020.09.09
 
 - 增加rtab-map建图

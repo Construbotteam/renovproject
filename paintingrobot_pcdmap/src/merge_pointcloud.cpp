@@ -43,7 +43,7 @@ void merge_pointcloud(const ros::Publisher& cloud_pub) {
             return;
         } else {
             cloud2 = *Ptr;
-            tf12.waitForTransform("kinect_1_frame_optical", "kinect_2_frame_optical", ros::Time(0), ros::Duration(1.0));
+            tf12.waitForTransform("kinect_1_frame_optical", "kinect_2_frame_optical", ros::Time(0), ros::Duration(5.0));
             pcl_ros::transformPointCloud("kinect_1_frame_optical", cloud2, cloud2_in1, tf12);
             //1+2点云
             pcl::concatenatePointCloud(cloud1, cloud2_in1, cloud_1plus2);
@@ -56,7 +56,7 @@ void merge_pointcloud(const ros::Publisher& cloud_pub) {
             return;
         } else {
             cloud3 = *Ptr;
-            tf13.waitForTransform("kinect_1_frame_optical", "kinect_3_frame_optical", ros::Time(0), ros::Duration(1.0));
+            tf13.waitForTransform("kinect_1_frame_optical", "kinect_3_frame_optical", ros::Time(0), ros::Duration(5.0));
             pcl_ros::transformPointCloud("kinect_1_frame_optical", cloud3, cloud3_in1, tf13);
             //12+3点云
             pcl::concatenatePointCloud(cloud_1plus2, cloud3_in1, merged_cloud);
